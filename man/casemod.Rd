@@ -35,4 +35,4 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 casemod("latex")
 casemod("latex",c(1,3,5))
 }
-\keyword{character}
+\keyword{misc}

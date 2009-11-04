@@ -1,41 +1,40 @@
-equate.eq <- function(x,y,scale,method="none",Ky=max(scale),xv,yv,
-  vscale,w,smooth="none",jmin,xscorefun,yscorefun,verbose=FALSE,...)
+equate.eq <- function(x,y,method="none",Ky=max(y[,1]),w=1,smooth="none",
+  jmin,xscorefun,yscorefun,verbose=FALSE,...)
 {
-  xtab <- freqtab(x,scale)
-  ytab <- freqtab(y,scale)
-
+  nc <- ncol(x)
+  xscale <- unique(x[,1])
+  xtab <- x
+  ytab <- y
   smooth <- match.arg(tolower(smooth),c("none","bump","average","loglin"))
   if(smooth=="bump")
   {
     if(missing(jmin)) jmin <- 10^-6
-    xsmooth <- freqbump(xtab[,2],jmin,Ky)*sum(xtab[,2])
-    ysmooth <- freqbump(ytab[,2],jmin,Ky)*sum(ytab[,2])
+    xsmooth <- freqbump(x[,nc],jmin,Ky)*sum(x[,nc])
+    ysmooth <- freqbump(y[,nc],jmin,Ky)*sum(y[,nc])
+    xtab[,nc] <- xsmooth
+    ytab[,nc] <- ysmooth
+  }
+  else if(smooth=="average" & nc==2)
+  {
+    if(missing(jmin)) jmin <- 1
+    xsmooth <- freqavg(x,jmin) 
+    ysmooth <- freqavg(y,jmin)
     xtab[,2] <- xsmooth
     ytab[,2] <- ysmooth
   }
-  else if(smooth=="average")
-  {
-    if(missing(jmin)) jmin <- 1
-    xsmooth <- freqavg(xtab,jmin) 
-    ysmooth <- freqavg(ytab,jmin)
-    xtab <- xsmooth[,c(1,3)]
-    ytab <- ysmooth[,c(1,3)]
-  }
   else if(smooth=="loglin")
   {
-    xsmooth <- loglinear(x,scale,xscorefun,...)
-    ysmooth <- loglinear(y,scale,yscorefun,...)
-    xtab[,2] <- xsmooth$fitc[,"smoothedcounts"]
-    ytab[,2] <- ysmooth$fitc[,"smoothedcounts"]
+    xsmooth <- loglinear(x,xscorefun,...)
+    ysmooth <- loglinear(y,yscorefun,...)
+    xtab[,nc] <- xsmooth$fitted
+    ytab[,nc] <- ysmooth$fitted
   }
-  
   method <- match.arg(tolower(method),c("none","frequency"))
-  if(method=="frequency")
+  if(method=="frequency" | nc==3)
   {
-    stabs <- synthetic(x,xv,y,yv,w,method,scale=scale,
-      vscale=vscale)
-    xtab[,2] <- stabs$synthtab[,2]
-    ytab[,2] <- stabs$synthtab[,3]
+    stabs <- synthetic(xtab,ytab,w,method)
+    xtab <- cbind(xscale,stabs$synthtab[,2])
+    ytab <- cbind(xscale,stabs$synthtab[,3])
   }
 
   xtab <- cbind(xtab,px=px(xtab),0)
@@ -45,7 +44,7 @@ equate.eq <- function(x,y,scale,method="none",Ky=max(scale),xv,yv,
   numK <- is.numeric(Ky)
   xn <- sum(xtab[,2])
   yn <- sum(ytab[,2])
-  Ly <- min(scale)
+  Ly <- min(xscale)
   xone <- which(xtab[,3]==1)
   xless <- sum(xtab[,3]!=1)
 
@@ -76,19 +75,21 @@ equate.eq <- function(x,y,scale,method="none",Ky=max(scale),xv,yv,
     }
   }
   
-  out <- list(yx=xtab[,4])
+  out <- xtab[,4]
   if(verbose)
   {
+    out <- list(yx=xtab[,4])
     if(smooth!="none")
     {
       out$smoothmethod <- smooth 
-      out$smoothout <- list(xsmooth=xsmooth,ysmooth=ysmooth)
+      out$smoothout <- list(x=xsmooth,y=ysmooth)
     }
     if(method=="frequency")
     {
       out <- c(out,stabs)
-      out$anchortab <- cbind(scale=vscale,xvcount=freqtab(xv,vscale)[,2],
-        yvcount=freqtab(yv,vscale)[,2])
+      out$anchortab <- cbind(scale=unique(x[,2]),
+        xvcount=tapply(x[,3],x[,2],sum),
+        yvcount=tapply(y[,3],y[,2],sum))
     }
     else out$yx <- cbind(yx=xtab[,4],se)
   }

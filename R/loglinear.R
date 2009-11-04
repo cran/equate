@@ -1,15 +1,15 @@
-loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
+loglinear <- function(x,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
 {
+  xscale <- unique(x[,1])
   if(missing(scorefun))
-    scorefun <- poly(scale,degree=degree,raw=raw)
+    scorefun <- poly(xscale,degree=degree,raw=raw)
   
-  freqtab <- freqtab(x,scale)
   output <- list()
-  n <- freqtab[,2]
+  counts <- x[,ncol(x)]
   colnames(scorefun) <- NULL
   b <- usb <- cbind(scorefun)
-  ntot <- sum(n)
-  a <- .8*n+.2*(ntot/length(n)) 
+  ntot <- sum(counts)
+  a <- .8*counts+.2*(ntot/length(counts)) 
   
   bssq <- rep(0,ncol(b))
   for(i in 1:ncol(b))
@@ -28,14 +28,14 @@ loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
   
   alpha <- -log(sum(exp(b%*%beta)))
   m <- as.vector(ntot*exp(alpha+b%*%beta))
-  likold <- alpha*ntot+sum((t(n)%*%b)%*%beta)
+  likold <- alpha*ntot+sum((t(counts)%*%b)%*%beta)
   a <- t(b)%*%diag(m)%*%b - t(b)%*%m%*%t(m)%*%b/ntot
-  c <- t(b)%*%n-t(b)%*%m
+  c <- t(b)%*%counts-t(b)%*%m
   delta <- solve(a,c)
   
   beta <- beta+delta
   alpha <- -log(sum(exp(b%*%beta)))
-  lik <- alpha*ntot+sum((t(n)%*%b)%*%beta)
+  lik <- alpha*ntot+sum((t(counts)%*%b)%*%beta)
   iter <- 1
   crit1 <- 0
   crit2 <- 0
@@ -47,7 +47,7 @@ loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
     likold <- lik
     iter <- iter+1
     a <- t(b)%*%diag(m)%*%b - t(b)%*%m%*%t(m)%*%b/ntot
-    c <- t(b)%*%n-t(b)%*%m
+    c <- t(b)%*%counts-t(b)%*%m
     delta <- solve(a,c)
     beta <- beta+delta
     alpha <- -log(sum(exp(b%*%beta)))
@@ -56,7 +56,7 @@ loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
     ebc2 <- matrix(0,nrow=ncol(b),ncol=3)
     for(i in 1:ncol(b))
     {
-      ebc2[i,1] <- t(b[,i])%*%n
+      ebc2[i,1] <- t(b[,i])%*%counts
       ebc2[i,2] <- t(b[,i])%*%m
       if(ebc2[i,1]==0) ebc2[i,3] <- abs(ebc2[i,2])
       if(abs(ebc2[i,1])>0) ebc2[i,3] <- abs((ebc2[i,1]-ebc2[i,2])/ebc2[i,1])
@@ -64,18 +64,18 @@ loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
     testerc2 <- max(ebc2[,3])
     if(testerc2>convergecrit) crit2 <- 0 
       else crit2 <- 1
-    lik <- alpha*ntot+sum((t(n)%*%b)%*%beta)
+    lik <- alpha*ntot+sum((t(counts)%*%b)%*%beta)
   }
   
-  liksum1 <- n/m
+  liksum1 <- counts/m
   liksum1[liksum1==0] <- 1
   liksum2 <- log(liksum1)
-  likchisquare <- 2*(t(n)%*%liksum2)
+  likchisquare <- 2*(t(counts)%*%liksum2)
   aic <- likchisquare+2*(ncol(b)+1)
   caic <- likchisquare+(1+log(ntot))*(ncol(b)+1)
-  pearsonchisquare <- sum((n-m)^2/m)
-  freemantukeychisquare <- sum((sqrt(n)+sqrt(n+1)-sqrt(4*m+1))^2)
-  df <- length(n)-ncol(b)-1
+  pearsonchisquare <- sum((counts-m)^2/m)
+  freemantukeychisquare <- sum((sqrt(counts)+sqrt(counts+1)-sqrt(4*m+1))^2)
+  df <- length(counts)-ncol(b)-1
   output$modelfit <- rbind(likchisquare,pearsonchisquare,freemantukeychisquare,aic,caic,df)
     rownames(output$modelfit) <- c('Likelihood Ratio Chi-square','Pearson Chi-square',
       'Freeman-Tukey Chi-square','AIC','CAIC','Degrees of Freedom')
@@ -101,11 +101,11 @@ loglinear <- function(x,scale,scorefun,degree,raw=TRUE,convergecrit=.0001,...)
   Nt <- 1/sqrt(ntot)
   C <- Nt*D%*%Q
   
-  p <- m/sum(m)
-  ftres <- sqrt(n)+sqrt(n+1)-sqrt(4*m+1)
-  output$fitc <- cbind(m,p,ftres,C)
-  colnames(output$fitc) <- c("smoothedcounts","smoothedprobs",
-    "ftresiduals",paste("C.",1:ncol(b),sep=""))
+  ftres <- sqrt(counts)+sqrt(counts+1)-sqrt(4*m+1)
+  output$fitted.values <- m
+  output$residuals <- ftres
+  output$cmatrix  <- C
+  colnames(output$cmatrix) <- colnames(scorefun) #paste("C.",1:ncol(b),sep="")
   output$scorefun <- scorefun
   return(output)
 }

@@ -6,21 +6,11 @@
 This function returns the score distribution for a hypothetical synthetic examinee population, as required when equating under the nonequivalent groups design.
 }
 \usage{
-synthetic(x, xv, y, yv, w, method, internal = TRUE, scale, vscale)
+synthetic(x, y, w, method, internal = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-vector of total scores for form X (one per examinee)
-}
-  \item{xv}{
-vector of scores (one per examinee) for form X examinees on the anchor test
-}
-  \item{y}{
-vector of total scores for form Y (one per examinee)
-}
-  \item{yv}{
-vector of scores (one per examinee) for form Y examinees on the anchor test
+  \item{x, y}{
+bivariate score distributions of class \dQuote{\code{\link{freqtab}}} for forms X, with the anchor, and Y with the anchor. Columns 1 and 2 of each include all score combinations for the total and anchor test score scales, and column 3 contains the number of examinees obtaining each combination (see \code{\link{freqtab}} for details)
 }
   \item{w}{
 value between 0 and 1 specifying the weight applied to form X scores (and implicitly specifying the form Y weight as \code{1 - w})
@@ -30,12 +20,6 @@ string specifying the equating method, where the options are \code{"tucker"}, \c
 }
   \item{internal}{
 logical indicating whether or not the anchor item scores are included in the total scores (default is \code{TRUE}). This is only required for the Levine method
-}
-  \item{scale}{
-the score scale, as a vector (only required for frequency estimation)
-}
-  \item{vscale}{
-the score scale for the anchor test, as a vector (only required for frequency estimation)
 }
 }
 \details{
@@ -55,12 +39,12 @@ Kolen, M. J., & Brennan, R. L. (2004) \emph{Test Equating, Scaling, and Linking}
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
-x <- KBneat$x[,1]
-xv <- KBneat$x[,2]
-y <- KBneat$y[,1]
-yv <- KBneat$y[,2]
-synthetic(x,xv,y,yv,w=1,method="T")
-synthetic(x,xv,y,yv,w=1,method="L")
-synthetic(x,xv,y,yv,w=1,method="F",scale=0:36,vscale=0:12)
+x <- KBneat$x
+x <- freqtab(x[,1],0:36,x[,2],0:12)
+y <- KBneat$y
+y <- freqtab(y[,1],0:36,y[,2],0:12)
+synthetic(x,y,w=1,method="T")
+synthetic(x,y,w=1,method="L")
+synthetic(x,y,w=1,method="F")
 }
-\keyword{multivariate}
+\keyword{methods}

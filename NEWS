@@ -1,0 +1,9 @@
+Changes in equate_0.1-1
+
+  o Functions loglinear and freqbump extended to 
+    handle smoothing of bivariate distributions
+
+  o Functions modified to accept scores only
+    as frequency tables (univariate or bivariate)
+
+  o Updated DESCRIPTION and Rd files

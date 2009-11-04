@@ -1,5 +1,4 @@
-kurt.freqtab <- function(freqtab)
+kurt.freqtab <- function(x)
 {
-  sum(((freqtab[,1]-mean(freqtab))^4)*freqtab[,2])/
-    (sum(freqtab[,2])-1)/var.freqtab(freqtab)^2
+  sum(((x[,1]-mean(x))^4)*x[,2])/(sum(x[,2])-1)/cov.freqtab(x)^2
 }

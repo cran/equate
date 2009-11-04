@@ -1,35 +1,37 @@
-equate <- function(x,y,scale,type,method="none",bootse=FALSE,
-  internal=TRUE,Ky=max(scale),xv,yv,vscale,w,...)
+equate <- function(x,y,type,method="none",bootse=FALSE,
+  internal=TRUE,Ky=max(y[,1]),w=1,...)
 {
-  xtab <- freqtab(x,scale)
-  ytab <- freqtab(y,scale)
-  xcounts <- xtab[,2]
-  ycounts <- ytab[,2]
+  nc <- ncol(x)
+  xscale <- unique(x[,1])
+  xcounts <- tapply(x[,nc],x[,1],sum)
+  ycounts <- tapply(y[,nc],y[,1],sum)
+  xtab <- freqtab(xcounts,xscale,addclass=TRUE)
+  ytab <- freqtab(ycounts,xscale,addclass=TRUE)
   mx <- mean(xtab)
-  sdx <- sqrt(var.freqtab(xtab))
+  sdx <- sqrt(cov.freqtab(xtab))
   my <- mean(ytab)
-  sdy <- sqrt(var.freqtab(ytab))
+  sdy <- sqrt(cov.freqtab(ytab))
 
   type <- match.arg(tolower(type),c("mean","linear","equipercentile"))
   eqfun <- switch(type,equipercentile="equate.eq","equate.ln")
   eqfun <- match.fun(eqfun)
-  eqout <- eqfun(x,y,scale,type=type,method=method,internal=internal,
-    verbose=TRUE,Ky=Ky,xv=xv,yv=yv,vscale=vscale,w=w,...)
+  eqout <- eqfun(x,y,type=type,method=method,internal=internal,
+    verbose=TRUE,Ky=Ky,w=w,...)
 
-  yx <- freqtab(xcounts,eqout$yx[1:length(scale)])
+  yx <- freqtab(xcounts,eqout$yx[1:length(xscale)],addclass=TRUE)
   out <- list(type=type,method=match.arg(tolower(method),
     c("none","tucker","levine","frequency estimation")))
   out$design <- ifelse(method=="none","random groups","nonequivalent groups")
   out$stats <- cbind(mean=c(mx,my,mean(yx)),sd=c(sdx,sdy,
-    sqrt(var.freqtab(yx))))
+    sqrt(cov.freqtab(yx))))
   rownames(out$stats) <- c("x","y","yx")
-  out$freqtab <- cbind(scale=scale,xcounts=xcounts,fx=fx(xtab),
+  out$freqtab <- cbind(scale=xscale,xcounts=xcounts,fx=fx(xtab),
     ycounts=ycounts,fy=fx(ytab))
-  out$concordance <- cbind(scale,eqout$yx)
+  out$concordance <- cbind(scale=xscale,yx=eqout$yx)
   out <- c(out,eqout[-1])
   if(bootse)
   { 
-    out$see <- se.boot(xtab,ytab,eqfun=eqfun,type=type,method=method,
+    out$see <- se.boot(x,y,eqfun=eqfun,type=type,method=method,
       internal=internal,...)
   }
   class(out) <- "equate"

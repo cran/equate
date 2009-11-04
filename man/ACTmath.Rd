@@ -8,7 +8,7 @@ This dataset contains score distributions for two forms of the ACT mathematics t
 }
 \usage{ACTmath}
 \format{
-A 41 by 3 matrix containing the score scale (column 1), frequencies for form X (column 2), and frequencies for form Y (column 3).
+A 41 by 3 matrix containing the score scale, frequencies for form X, and frequencies for form Y
 }
 \source{
 Kolen, M. J., & Brennan, R. L. (2004) \emph{Test Equating, Scaling, and Linking}. (2nd ed.), New York: Springer.

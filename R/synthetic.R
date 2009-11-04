@@ -1,49 +1,54 @@
-synthetic <- function(x,xv,y,yv,w,method,internal=TRUE,scale,vscale)
+synthetic <- function(x,y,w,method,internal=TRUE)
 {
+  xscale <- unique(x[,1])
+  vscale <- unique(x[,2])
   yw <- 1-w
   mx <- mean(x)
-  varx <- var(x)
-  mxv <- mean(xv)
-  varxv <- var(xv)
+  varx <- cov.freqtab(x[,-2])
+  mxv <- mean.freqtab(x[,-1])
+  varxv <- cov.freqtab(x[,-1])
   my <- mean(y)
-  vary <- var(y)
-  myv <- mean(yv)
-  varyv <- var(yv)
+  vary <- cov.freqtab(y[,-2])
+  myv <- mean.freqtab(y[,-1])
+  varyv <- cov.freqtab(y[,-1])
 
   method <- match.arg(tolower(method),c("tucker","levine","frequency"))  
   if(method=="frequency")
   {
-    xj <- table(factor(x,levels=scale),factor(xv,levels=vscale))/length(x)
-    yj <- table(factor(y,levels=scale),factor(yv,levels=vscale))/length(y)
+    xj <- matrix(x[,3]/sum(x[,3]),ncol=length(vscale),nrow=length(xscale),byrow=TRUE)
+    yj <- matrix(y[,3]/sum(y[,3]),ncol=length(vscale),nrow=length(xscale),byrow=TRUE)
     h1 <- apply(xj,2,sum)
     h2 <- apply(yj,2,sum)
     fx2 <- (xj%*%diag(1/h1))%*%diag(h2)
     gy1 <- (yj%*%diag(1/h2))%*%diag(h1)
-    fs <- (w*apply(xj,1,sum)+yw*apply(fx2,1,sum))*length(x)
-    gs <- (w*apply(gy1,1,sum)+yw*apply(yj,1,sum))*length(y)
-    fstab <- freqtab(fs,scale)
-    gstab <- freqtab(gs,scale)
+    fs <- (w*apply(xj,1,sum)+yw*apply(fx2,1,sum))*sum(x[,3])
+    gs <- (w*apply(gy1,1,sum)+yw*apply(yj,1,sum))*sum(y[,3])
+    fstab <- freqtab(fs,xscale,addclass=TRUE)
+    gstab <- freqtab(gs,xscale,addclass=TRUE)
     msx <- mean(fstab)
     msy <- mean(gstab)
-    sdsx <- sqrt(var.freqtab(fstab))
-    sdsy <- sqrt(var.freqtab(gstab))
+    sdsx <- sqrt(cov.freqtab(fstab))
+    sdsy <- sqrt(cov.freqtab(gstab))
   }  
   else
   {
+    covxv <- cov.freqtab(x)
+    covyv <- cov.freqtab(y)
+
     if(method=="tucker")
     {
-      slope1 <- cov(x,xv)/varxv
-      slope2 <- cov(y,yv)/varyv
+      slope1 <- covxv/varxv
+      slope2 <- covyv/varyv
     }
     else if(method=="levine" & internal)
     {
-      slope1 <- varx/cov(x,xv)
-      slope2 <- vary/cov(y,yv)
+      slope1 <- varx/covxv
+      slope2 <- vary/covyv
     }
     else if(method=="levine" & !internal)
     {
-      slope1 <- (varx+cov(x,xv))/(varxv+cov(x,xv))
-      slope2 <- (vary+cov(y,yv))/(varyv+cov(y,yv))
+      slope1 <- (varx+covxv)/(varxv+covxv)
+      slope2 <- (vary+covyv)/(varyv+covyv)
     }
     msx <- mx-(yw*slope1*(mxv-myv))
     msy <- my+(w*slope2*(mxv-myv))
@@ -59,6 +64,6 @@ synthetic <- function(x,xv,y,yv,w,method,internal=TRUE,scale,vscale)
     ys=c(msy,sdsy)))
   colnames(out$synthstats) <- c("mean","sd")
   if(method=="frequency") 
-    out <- c(out,list(synthtab=cbind(scale,xcount=fstab[,2],ycount=gstab[,2])))
+    out <- c(out,list(synthtab=cbind(xscale,xcount=fstab[,2],ycount=gstab[,2])))
   return(out)
 }

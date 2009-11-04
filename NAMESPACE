@@ -1,5 +1,6 @@
 export(ACTmath,
   casemod,
+  cov.freqtab,
   equate.eq,
   equate.ln,
   equate,
@@ -17,5 +18,4 @@ export(ACTmath,
   se.eq,
   se.ln,
   skew.freqtab,
-  synthetic,
-  var.freqtab)
+  synthetic)

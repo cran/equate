@@ -1,18 +1,19 @@
-equate.ln <- function(x,y,scale,type="linear",method="none",xv,yv,
-  vscale,w=1,internal=TRUE,verbose=FALSE,...)
+equate.ln <- function(x,y,type="linear",method="none",w=1,
+  internal=TRUE,verbose=FALSE,...)
 {
-  xtab <- freqtab(x,scale)
-  ytab <- freqtab(y,scale)
-  mx <- mean(xtab)
-  sdx <- sqrt(var.freqtab(xtab))
-  my <- mean(ytab)
-  sdy <- sqrt(var.freqtab(ytab))
-  
+  xscale <- unique(x[,1])
   method <- match.arg(tolower(method),c("none","tucker","levine"))
-  if(method=="none") stats <- c(mx,sdx,my,sdy)
+  if(method=="none") 
+  {
+    mx <- mean(x)
+    sdx <- sqrt(cov.freqtab(x))
+    my <- mean(y)
+    sdy <- sqrt(cov.freqtab(y))
+    stats <- c(mx,sdx,my,sdy)
+  }
   else
   {
-    synthstats <- synthetic(x,xv,y,yv,w,method,internal)$s
+    synthstats <- synthetic(x,y,w,method,internal)$s
     stats <- synthstats[c(5,11,6,12)]
   }
 
@@ -20,18 +21,20 @@ equate.ln <- function(x,y,scale,type="linear",method="none",xv,yv,
   if(type=="mean") slope <- 1
   else slope <- stats[4]/stats[2]
   intercept <- stats[3]-slope*stats[1]
-  yx <- slope*xtab[,1]+intercept
+  yx <- slope*xscale+intercept
 
-  out <- list(yx=cbind(yx))
+  out <- yx
   if(verbose)
   {
+    out <- list(yx=yx)
     out$coefficients <- rbind(intercept,slope)
-    if(method=="none") out$yx <- cbind(yx=yx,se=se.ln(x,y,scale))
+    if(method=="none") out$yx <- cbind(yx=yx,se=se.ln(x,y))
     else
     {
       out$synthstats <- synthstats[-(1:2),]
-      out$anchortab <- cbind(scale=vscale,xvcount=freqtab(xv,vscale)[,2],
-        yvcount=freqtab(yv,vscale)[,2])
+      out$anchortab <- cbind(scale=unique(x[,2]),
+        xvcount=tapply(x[,3],x[,2],sum),
+        yvcount=tapply(y[,3],y[,2],sum))
     }
   }
   return(out)

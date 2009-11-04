@@ -1,5 +1,4 @@
-skew.freqtab <- function(freqtab)
+skew.freqtab <- function(x)
 {
-  sum(((freqtab[,1]-mean(freqtab))^3)*freqtab[,2])/
-    (sum(freqtab[,2])-1)/var.freqtab(freqtab)^1.5
+  sum(((x[,1]-mean(x))^3)*x[,2])/(sum(x[,2])-1)/cov.freqtab(x)^1.5
 }

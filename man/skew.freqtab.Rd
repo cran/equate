@@ -6,20 +6,18 @@
 This function returns the skewness of a frequency table of class \dQuote{\code{\link{freqtab}}}
 }
 \usage{
-skew.freqtab(freqtab)
+skew.freqtab(x)
 }
 \arguments{
-  \item{freqtab}{
+  \item{x}{
 two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point
 }
-}
-\value{
 }
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \seealso{
-\code{\link{kurt.freqtab}}, \code{\link{var.freqtab}}
+\code{\link{kurt.freqtab}}, \code{\link{cov.freqtab}}
 }
 \examples{
 set.seed(2005)

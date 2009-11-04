@@ -1,1 +1,1 @@
-mean.freqtab <- function(x,...) sum(x[,1]*x[,2])/sum(x[,2])
+mean.freqtab <- function(x,...) sum(x[,1]*x[,ncol(x)])/sum(x[,ncol(x)])

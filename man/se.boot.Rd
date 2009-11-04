@@ -3,14 +3,15 @@
 \alias{se.boot}
 \title{Bootstrap Standard Errors of Equating}
 \description{
-This function calculates the standard deviation of equated scores over multiple replications of a specified equating.
+This function returns the standard deviation of equated scores over multiple replications of a specified equating.
 }
 \usage{
-se.boot(x, y, xn = sum(x[, 2]), yn = sum(y[, 2]), reps = 500, eqfun, ...)
+se.boot(x, y, xn = sum(x[,ncol(x)]), yn = sum(y[,ncol(y)]), 
+  reps = 500, eqfun, ...)
 }
 \arguments{
   \item{x, y}{
-two-column matrices of class \code{freqtab}, where column 1 specifies the score scale and column 2 the frequencies for each score point
+score distributions of class \dQuote{\code{\link{freqtab}}} for forms X and Y. Under the random groups design (i.e., no anchor test) \code{x} and \code{y} will each contain the score scale in column 1, and the number of examinees obtaining each score in column 2. For the nonequivalent groups design bivariate frequency tables are used, where columns 1 and 2 include all score combinations for the total and anchor test score scales, and column 3 contains the number of examinees obtaining each combination (see \code{\link{freqtab}} for details)
 }
   \item{xn, yn}{
 integers specifying the number of scores to sample from each distribution at each replication (default is the total number of scores in each)

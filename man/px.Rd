@@ -6,14 +6,12 @@
 This function returns the percentile ranks for each score point in a frequency distribution.
 }
 \usage{
-px(freqtab)
+px(x)
 }
 \arguments{
-  \item{freqtab}{
-two-column matrix of class \code{freqtab}, where column 1 specifies the score scale and column 2 the frequencies for each score point
+  \item{x}{
+two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point
 }
-}
-\details{
 }
 \value{
 Returns a vector of percentile ranks

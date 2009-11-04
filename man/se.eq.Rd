@@ -28,6 +28,4 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \seealso{
 \code{\link{equate.eq}}
 }
-\examples{
-}
 \keyword{internal}
