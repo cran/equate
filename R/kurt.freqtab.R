@@ -1,4 +1,6 @@
-kurt.freqtab <- function(x)
-{
-  sum(((x[,1]-mean(x))^4)*x[,2])/(sum(x[,2])-1)/cov.freqtab(x)^2
+kurt.freqtab <- function(x) {
+  nc <- ncol(x)
+  i <- x[, nc] > 0
+  sum(((x[i, 1] - mean(x))^4) * x[i, nc])/(sum(x[i, nc]) - 1)/
+    cov.freqtab(x[, c(1, nc)])^2
 }

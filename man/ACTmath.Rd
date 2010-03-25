@@ -1,5 +1,4 @@
 \name{ACTmath}
-\Rdversion{1.1}
 \alias{ACTmath}
 \docType{data}
 \title{ACT Mathematics Test Scores}
@@ -11,7 +10,7 @@ This dataset contains score distributions for two forms of the ACT mathematics t
 A 41 by 3 matrix containing the score scale, frequencies for form X, and frequencies for form Y
 }
 \source{
-Kolen, M. J., & Brennan, R. L. (2004) \emph{Test Equating, Scaling, and Linking}. (2nd ed.), New York: Springer.
+Kolen, M. J., and Brennan, R. L. (2004) \emph{Test Equating, Scaling, and Linking}. (2nd ed.), New York: Springer.
 
 The dataset is also provided with the equating software RAGE, available at the following link:
 \url{http://www.education.uiowa.edu/casma/computer_programs.htm#equating}

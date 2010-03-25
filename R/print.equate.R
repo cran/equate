@@ -1,19 +1,23 @@
-print.equate <- function(x,...)
-{
-  design <- casemod(x$design)
-  if(x$method=="none") method <- casemod(x$type)
-  else method <- paste(casemod(x$method),x$type)
-  
-  cat("\n",method," equating: ",design,"\n",sep="")
-  cat("\nSummary Statistics:\n")
-  if(design=="random groups") print.default(x$stats)
-  else print.default(rbind(x$stats,x$synthstats),quote=FALSE)
-  if(method!="Equipercentile")
-  {
-    cat("\nCoefficients:\n")
-    print.default(x$coef,quote=FALSE)
+print.equate <- function(x, ...) {
+  up <- function(x)
+    gsub("\\b(\\w)", "\\U\\1", x, perl = TRUE)
+  design <- up(x$design)
+  if(x$method == "none")
+    method <- up(x$type)
+  else method <- paste(up(x$method), up(x$type))
+
+  cat("\n", method, " Equating: ", design, sep = "")
+  cat("\n\nSummary Statistics:\n")
+  print(round(x$stats, 4))
+  if(x$method != "none" & x$method != "chained" &
+    x$type != "circle-arc")
+    print(round(x$synthstats, 4))
+  cat("\n")
+
+  if(x$type != "equipercentile") {
+    cat("Coefficients:\n")
+    print(round(x$coef, 4))
+    cat("\n")
   }
-  cat("\nConcordance Table:\n")
-  print.default(x$concord,quote=FALSE)
   invisible(x)
 }

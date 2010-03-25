@@ -1,5 +1,4 @@
 \name{KBneat}
-\Rdversion{1.1}
 \alias{KBneat}
 \docType{data}
 \title{Test Scores under a NEAT design}
