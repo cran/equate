@@ -43,7 +43,7 @@ xtab <- freqtab(xscale, x)
 
 xavg <- freqavg(xtab)
 xbump <- freqbump(xtab)
-cbind(xtab, avg=xavg,
-  bump=round(xbump*sum(xtab[,2]), 6))
+cbind(xtab, avg = xavg,
+  bump = round(xbump * sum(xtab[, 2]), 6))
 }
 \keyword{smooth}

@@ -15,9 +15,10 @@ synthetic <- function(x, y, w = 1, method, internal = TRUE,
   myv <- mean.freqtab(y[, -1])
   varyv <- cov.freqtab(y[, -1])
 
-  method <- match.arg(tolower(method),
-    c("tucker", "levine", "frequency", "braun/holland"))
-  if(method == "frequency" | method == "braun/holland") {
+  method <- match.arg(tolower(method), c("nominal weights",
+    "tucker", "levine", "frequency estimation", "braun/holland"))
+  if(method == "frequency estimation" |
+    method == "braun/holland") {
     xj <- matrix(x[, 3]/sum(x[, 3]), ncol = length(vscale),
       nrow = length(xscale), byrow = TRUE)
     yj <- matrix(y[, 3]/sum(y[, 3]), ncol = length(vscale),
@@ -41,6 +42,8 @@ synthetic <- function(x, y, w = 1, method, internal = TRUE,
     covxv <- cov.freqtab(x)
     covyv <- cov.freqtab(y)
 
+    if(method == "nominal weights")
+      slope1 <- slope2 <- max(vscale)/max(xscale)
     if(method == "tucker") {
       slope1 <- covxv/varxv
       slope2 <- covyv/varyv
@@ -72,7 +75,8 @@ synthetic <- function(x, y, w = 1, method, internal = TRUE,
     colnames(out$synthstats) <- c("mean", "sd")
     out$w <- w
   }
-  if(method == "frequency" | method == "braun/holland")
+  if(method == "frequency estimation" |
+    method == "braun/holland")
     out <- c(out, list(synthtab = cbind(xscale,
       xcount = fstab[, 2], ycount = gstab[, 2])))
   return(out)

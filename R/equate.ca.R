@@ -1,4 +1,4 @@
-equate.ca <- function(x, y, type, method = "none", lowp,
+equate.ca <- function(x, y, type, method = NA, lowp,
   midp = "mean", highp, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
@@ -14,8 +14,9 @@ equate.ca <- function(x, y, type, method = "none", lowp,
 
   x2 <- mean(x)
   method <- match.arg(tolower(method),
-    c("none", "tucker", "levine", "chained", "braun/holland"))
-  if(method == "none")
+    c(NA, "nominal weights", "tucker", "levine", "chained",
+      "braun/holland"))
+  if(is.na(method))
     y2 <- mean(y)
   else if(method == "chained") {
     sdy <- sd.freqtab(y[, -2])
@@ -48,7 +49,7 @@ equate.ca <- function(x, y, type, method = "none", lowp,
       ycenter = ycent, r)[,1]
     out$points <- rbind(x = c(x1, x2, x3), y = c(y1, y2, y3))
     colnames(out$points) <- c("low", "middle", "high")
-    if(method != "none") {
+    if(!is.na(method)) {
       out$anchorstats <- rbind(descript(x[, -1]),
         descript(y[, -1]))
       rownames(out$anchorstats) <- c("xv", "yv")

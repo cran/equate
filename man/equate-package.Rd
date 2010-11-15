@@ -5,13 +5,13 @@
 Statistical Methods for Test Score Equating
 }
 \description{
-The equate package contains functions for non-IRT equating under both random groups and nonequivalent groups with anchor test designs. Mean, linear, equipercentile and circle-arc equating are supported, as are methods for univariate and bivariate presmoothing of score distributions. Specific equating methods currently supported include Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating.
+The equate package contains functions for non-IRT equating under both random groups and nonequivalent groups with anchor test designs. Mean, linear, equipercentile and circle-arc equating are supported, as are methods for univariate and bivariate presmoothing of score distributions. Specific equating methods currently supported include nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating.
 }
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 1.0-0\cr
-Date: \tab 2010-3-25\cr
+Version: \tab 1.1-0\cr
+Date: \tab 2010-11-15\cr
 Depends: \tab R (>= 2.10.0)\cr
 License: \tab GPL (>= 2)\cr
 }

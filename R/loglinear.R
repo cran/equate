@@ -1,6 +1,19 @@
 loglinear <- function(x, scorefun, degree, raw = TRUE,
   convergecrit = .0001, ...) {
 
+  a.fn <- function(ab, am, antot){
+    atemp <- matrix(nrow = ncol(ab), ncol = ncol(ab))
+    for(i in 1:ncol(ab)){
+      for(j in 1:ncol(ab)){
+        ba1 <- sum(ab[, i] * am)
+        ba2 <- sum(ab[, j] * am)
+        ba3 <- sum(ab[, i] * ab[, j] * am)
+        atemp[i, j] <- ba3 - (ba1 * ba2/antot)
+      }
+    }
+    return(atemp)
+  }
+
   nc <- ncol(x)
   if(missing(scorefun)) {
     scorefun <- vector()
@@ -25,16 +38,33 @@ loglinear <- function(x, scorefun, degree, raw = TRUE,
     }
   }
 
-  iB1 <- t(b) %*% diag(a) %*% b -
-    t(b) %*% a %*% t(a) %*% b/ntot
-  iB2 <- t(b) %*% diag(a) %*% log(a) -
-    t(b) %*% a %*% t(a) %*% log(a)/ntot
+  iB1 <- matrix(nrow = ncol(b), ncol = ncol(b))
+  for(k in 1:ncol(b)){
+    for(j in 1:ncol(b)){
+      ba1 <- ba2 <- ba3 <- 0
+      for(i in 1:nrow(b)){
+        ba1 <- ba1 + b[i, k] * a[i]
+        ba2 <- ba2 + b[i, j] * a[i]
+        ba3 <- ba3 + b[i, k] * b[i, j] * a[i]
+      }
+      iB1[k, j] <- ba3 - (ba1 * ba2/ntot)
+    }
+  }
+
+  iB2 <- vector(length = ncol(b))
+  for(i in 1:ncol(b)){
+    ba1 <- sum(b[, i] * a)
+    ba2 <- sum(log(a) * a)
+    ba3 <- sum(b[, i] * log(a) * a)
+    iB2[i] <- ba3 - (ba1 * ba2/ntot)
+  }
+
   B <- as.matrix(solve(iB1, iB2))
 
   alpha <- -log(sum(exp(b %*% B)))
   m <- as.vector(ntot * exp(alpha + b %*% B))
   likold <- alpha * ntot + sum((t(counts) %*% b) %*% B)
-  a <- t(b) %*% diag(m) %*% b - t(b) %*% m %*% t(m) %*% b/ntot
+  a <- a.fn(b, m, ntot)
   c <- t(b) %*% counts - t(b) %*% m
   delta <- solve(a, c)
 
@@ -51,7 +81,7 @@ loglinear <- function(x, scorefun, degree, raw = TRUE,
     likchang <- abs((lik - likold)/likold)
     likold <- lik
     iter <- iter + 1
-    a <- t(b) %*% diag(m) %*% b - t(b) %*% m %*% t(m) %*% b/ntot
+    a <- a.fn(b, m, ntot)
     c <- t(b) %*% counts - t(b) %*% m
     delta <- solve(a, c)
     B <- B + delta
@@ -90,9 +120,7 @@ loglinear <- function(x, scorefun, degree, raw = TRUE,
     "Pearson Chi-square", "Freeman-Tukey Chi-square",
     "AIC", "CAIC", "Degrees of Freedom")
 
-  a <- t(usb) %*% diag(m) %*% usb -
-    t(usb) %*% m %*% t(m) %*% usb/ntot
-  tscorefunctions <- t(scorefun)
+  a <- a.fn(usb, m, ntot)
   B2 <- B/sqrt(bssq)
   stdbeta <- tryCatch(sqrt(diag(solve(a, ...))),
     error = function(x) NA)
@@ -103,14 +131,21 @@ loglinear <- function(x, scorefun, degree, raw = TRUE,
 
   mf <- m/sum(m)
   sqm <- sqrt(mf)
-  Diag <- diag(sqm)
   ones <- matrix(1, nrow = nrow(b), ncol = 1)
 
-  qrsum <- ones %*% t(ones) %*% diag(mf) %*% b
-  QR <- sqrt(mf) * (b - qrsum)
+  QR <- matrix(nrow = nrow(b), ncol = ncol(b))
+  for(i in 1:ncol(b)){
+    qrsum <- 0
+    for(j in 1:nrow(b))
+      qrsum <- qrsum + b[j, i] * mf[j]
+    for(k in 1:nrow(b))
+      QR[k, i] <- sqrt(mf[k]) * (b[k, i] - qrsum)
+  }
   Q <- qr(QR)$qr[, 1:ncol(b)]
   Nt <- 1/sqrt(ntot)
-  Cmat <- Nt * Diag %*% Q
+  Cmat <- matrix(nrow = nrow(b), ncol = ncol(b))
+  for(i in 1:nrow(b))
+    Cmat[i,] <- Nt * sqm[i] * Q[i,]
 
   ftres <- sqrt(counts) + sqrt(counts + 1) - sqrt(4 * m + 1)
   output$fitted.values <- m

@@ -1,4 +1,4 @@
-equate.eq <- function(x, y, method = "none", Ky = max(y[, 1]),
+equate.eq <- function(x, y, method = NA, Ky = max(y[, 1]),
   w = 1, smoothmeth = "none", jmin, xscorefun, yscorefun,
   verbose = FALSE, ...) {
 
@@ -34,13 +34,16 @@ equate.eq <- function(x, y, method = "none", Ky = max(y[, 1]),
   }
 
   method <- match.arg(tolower(method),
-    c("none", "frequency", "chained"))
-  if(method == "frequency") {
+    c(NA, "frequency estimation", "chained"))
+  if(is.na(method))
+      yx <- equipercentile(xtab, ytab, Ky)
+  else if(method == "frequency estimation") {
     stabs <- synthetic(xtab, ytab, w, method)
-    xtab <- cbind(xscale, stabs$synthtab[, 2])
-    ytab <- cbind(yscale, stabs$synthtab[, 3])
+    xtab <- as.freqtab(xscale, stabs$synthtab[, 2])
+    ytab <- as.freqtab(yscale, stabs$synthtab[, 3])
+    yx <- equipercentile(xtab, ytab, Ky)
   }
-  if(method == "chained") {
+  else if(method == "chained") {
     xvtab <- as.freqtab(unique(xtab[, 2]),
       tapply(xtab[, 3], xtab[, 2], sum))
     xtab <- as.freqtab(xscale, tapply(xtab[, 3], xtab[, 1], sum))
@@ -51,16 +54,13 @@ equate.eq <- function(x, y, method = "none", Ky = max(y[, 1]),
     pvyx <- px(vx, yvtab)
     yx <- cbind(equipercentile(pvyx, ytab))
   }
-  else
-    yx <- equipercentile(as.freqtab(xtab),
-      as.freqtab(ytab), Ky)
 
   if(verbose) {
-    if(method == "none")
+    if(is.na(method))
       out <- list(yx=yx)
     else {
       out <- list(yx = yx[, 1])
-      if(method == "frequency")
+      if(method == "frequency estimation")
         out <- c(out, stabs)
       if(method == "chained")
         out$chaintab <- cbind(vxx = vx, pvyx = pvyx)

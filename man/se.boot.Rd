@@ -40,8 +40,8 @@ Returns either a vector of standard deviations, one per score scale point, or a 
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
-xtab <- freqtab(0:36, KBneat$x[,1])
-ytab <- freqtab(0:36, KBneat$y[,1])
-se.boot(xtab, ytab, reps=100, eqfun="equate.ln")
+xtab <- freqtab(0:36, KBneat$x[, 1])
+ytab <- freqtab(0:36, KBneat$y[, 1])
+se.boot(xtab, ytab, reps = 100, eqfun = "equate.ln")
 }
 \keyword{methods}

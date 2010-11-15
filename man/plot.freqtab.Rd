@@ -48,12 +48,12 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \examples{
 xscale <- 0:36
 vscale <- 0:12
-neat.xv <- freqtab(xscale, KBneat$x[,1],
-  vscale, KBneat$x[,2])
+neat.xv <- freqtab(xscale, KBneat$x[, 1],
+  vscale, KBneat$x[, 2])
 plot(neat.xv)
 
-neat.x <- freqtab(xscale, KBneat$x[,1])
-neat.v <- freqtab(vscale, KBneat$x[,2])
-plot(neat.x, neat.v, lwd=2)
+neat.x <- freqtab(xscale, KBneat$x[, 1])
+neat.v <- freqtab(vscale, KBneat$x[, 2])
+plot(neat.x, neat.v, lwd = 2)
 }
 \keyword{misc}

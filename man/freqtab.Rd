@@ -41,13 +41,13 @@ x1 <- round(rnorm(1000, 100, 10))
 x1scale <- 70:130
 freqtab(x1scale, x1)
 
-x2 <- ACTmath[,2]
-x2scale <- ACTmath[,1]
+x2 <- ACTmath[, 2]
+x2scale <- ACTmath[, 1]
 as.freqtab(x2scale, x2)
 
 xscale <- 0:36
 vscale <- 0:12
-freqtab(xscale, KBneat$x[,1],
-  vscale, KBneat$x[,2])
+freqtab(xscale, KBneat$x[, 1],
+  vscale, KBneat$x[, 2])
 }
 \keyword{utilities}

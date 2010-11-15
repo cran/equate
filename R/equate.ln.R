@@ -1,11 +1,12 @@
-equate.ln <- function(x, y, type = "linear", method = "none",
+equate.ln <- function(x, y, type = "linear", method = NA,
   w = 1, internal = TRUE, lts = FALSE, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
   type <- match.arg(tolower(type), c("mean", "linear"))
   method <- match.arg(tolower(method),
-    c("none", "tucker", "levine", "chained", "braun/holland"))
-  if(method == "none") {
+    c(NA, "nominal weights", "tucker", "levine", "chained",
+      "braun/holland"))
+  if(is.na(method)) {
     slope <-
       ifelse(type == "mean", 1, sd.freqtab(y)/sd.freqtab(x))
     intercept <- mean(y) - slope * mean(x)
@@ -39,7 +40,7 @@ equate.ln <- function(x, y, type = "linear", method = "none",
   if(verbose) {
     out <- list(yx = yx)
     out$coefficients <- rbind(intercept, slope)[, 1]
-    if(method == "none")
+    if(is.na(method))
       out$yx <- cbind(yx = yx, se = se.ln(x, y))
     else {
       if(method != "chained" & !lts)

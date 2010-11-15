@@ -27,7 +27,7 @@ optional frequency distribution of class \dQuote{\code{\link{freqtab}}} (see det
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
-x <- freqtab(0:40, ACTmath[,2])
+x <- freqtab(0:40, ACTmath[, 2])
 px(x)
 fx(x)
 px(c(8.2, 40, 41), x)

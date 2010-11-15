@@ -1,4 +1,4 @@
-equate <- function(x, y, type, method = "none",
+equate <- function(x, y, type, method = NA, name = NULL,
   bootse = FALSE, ...) {
 
   if(class(y) == "equate") {
@@ -36,10 +36,11 @@ equate <- function(x, y, type, method = "none",
   ytab <- as.freqtab(xscale, ycount)
   yx <- as.freqtab(eqout$yx[1:length(xscale)], xcount)
 
-  out <- list(type = type, method = match.arg(tolower(method),
-    c("none", "tucker", "levine", "frequency estimation",
-      "chained", "braun/holland")))
-  out$design <- ifelse(method == "none",
+  out <- list(name = name, type = type,
+    method = match.arg(tolower(method),
+      c(NA, "nominal weights", "tucker", "levine",
+        "frequency estimation", "chained", "braun/holland")))
+  out$design <- ifelse(is.na(method),
     "random groups", "nonequivalent groups")
   out$stats <- rbind(x = c(descript(x)), y = c(descript(y)),
     yx = c(descript(yx)))

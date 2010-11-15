@@ -47,7 +47,7 @@ As noted above, the equivalent groups is the simpler equating design. The tradit
 
 \section{Equating Types and Methods}
 \subsection*{Types of Equating}
-Equatings with the equivalent groups design, that is, equatings in their simplest and most general form, are referred to here and in the \package{equate} package as equating \emph{types}. These can be categorized as either linear, including mean and linear equating, or nonlinear, equipercentile equating. An additional nonlinear type supported in the \package{equate} package is circle-arc equating, as recently introduced by \citeA{livingston2009circle}.
+Equatings with the equivalent groups design, that is, equatings in their simplest and most general form, are referred to here and in the \package{equate} package as equating \emph{types}. These can be categorized as either linear, including mean and linear equating, or nonlinear, equipercentile equating. An additional nonlinear type supported in the \package{equate} package is circle-arc equating, as introduced by \citeA{livingston2009circle}.
 
 \subsubsection*{Linear equating}
 Linear equating defines a linear relationship between scores from forms $X$ and $Y$, based on the mean and standard deviation of each. In other words, the standardized deviation scores, or z-scores, are set equal for all score points $i$:
@@ -123,19 +123,26 @@ The Tucker method assumes that across populations 1 and 2: 1) the coefficients r
 \begin{table}[th]
 \caption{Applicable Equating Types and Methods}
 \begin{center}
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \hline
-& \code{tucker} & \code{levine} & \code{braun} & \code{frequency} & \code{chained} \\
+& \code{nominal} & \code{tucker} & \code{levine} & \code{braun} & \code{frequency} & \code{chained} \\
 \hline
-\code{mean}             & $\surd$ & $\surd$ & $\surd$ &         & $\surd$ \\
-\code{linear}           & $\surd$ & $\surd$ & $\surd$ &         & $\surd$ \\
-\code{equipercentile}   &         &         &         & $\surd$ & $\surd$ \\
-\code{circle-arc}       & $\surd$ & $\surd$ & $\surd$ &         & $\surd$ \\
+\code{mean}             & $\surd$ & $\surd$ & $\surd$ & $\surd$ &       & $\surd$ \\
+\code{linear}           &         & $\surd$ & $\surd$ & $\surd$ &         & $\surd$ \\
+\code{equipercentile}   &         &         &         &         & $\surd$ & $\surd$ \\
+\code{circle-arc}       & $\surd$ & $\surd$ & $\surd$ & $\surd$ &         & $\surd$ \\
 \hline
 \end{tabular}
 \end{center}
 \label{tab:typesmethods}
 \end{table}
+
+\subsubsection*{Nominal weights equating}
+Nominal weights equating is a simplified version of the Tucker method where the total and anchor tests are assumed to have similar statistical properties and to correlate perfectly within populations 1 and 2. In this case the $\gamma$ terms can be approximated by the ratios:
+\begin{equation}
+  \gamma_1 = \frac{K(X)}{K(V)} \eqnspace \text{and} \eqnspace \gamma_2 = \frac{K(Y)}{K(V)},
+\end{equation}
+where $K$ is the number of items on the test.
 
 \subsubsection*{Levine equating}
 Assumptions for the Levine observed score method are stated in terms of true scores (though only observed scores are used), where, across both populations: 1) the correlation between true scores on $X$ and $V$ is 1, as is the correlation between true scores on $Y$ and $V$; 2) the coefficients resulting form a regression of true scores for $X$ on $V$ are the same, as with true scores for $Y$ on $V$; and 3) measurement error variance is the same (across populations) for $X$, $Y$, and $V$. These assumptions make possible the estimation of $\gamma$ as

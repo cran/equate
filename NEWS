@@ -1,3 +1,11 @@
+equate_1.1-0 (2010-11-15)
+
+  o plot.freqtab updated
+
+  o New equating type: nominal weights
+
+  o loglinear smoothing function fixed
+
 equate_1.0-0 (2010-03-24)
 
   o New package vignette introduces concepts and

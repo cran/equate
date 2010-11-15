@@ -10,10 +10,10 @@
 \alias{print.equate}
 \title{Statistical Equating}
 \description{
-This function performs traditional (i.e., non-IRT) equating of test scores under the random groups and nonequivalent groups with anchor test designs.
+This function equates test scores under the random groups and nonequivalent groups with anchor test designs.
 }
 \usage{
-equate(x, y, type, method = "none", bootse = FALSE, ...)
+equate(x, y, type, method = NA, name = NULL, bootse = FALSE, ...)
 }
 \arguments{
   \item{x, y}{
@@ -23,7 +23,10 @@ score distributions of class \dQuote{\code{\link{freqtab}}} for forms X and Y. T
 the type of equating, as the string \code{"mean"}, \code{"linear"}, \code{"equipercentile"}, \code{"circle-arc"}, or abbreviations of these
 }
   \item{method}{
-string specifying the equating method, where \code{"none"} (default) indicates equating under the random groups design, and \code{"tucker"}, \code{"levine"}, \code{"frequency"} (i.e., frequency estimation), \code{"braun/holland"}, and \code{"chained"} indicate the respective methods under the nonequivalent groups design
+string specifying the equating method, where \code{NA} (default) indicates equating under the random groups design, and \code{"nominal weights"}, \code{"tucker"}, \code{"levine"}, \code{"frequency estimation"}, \code{"braun/holland"}, and \code{"chained"} (or abbreviations of these) indicate the respective methods under the nonequivalent groups design
+}
+  \item{name}{
+An optional name, used to label the output
 }
   \item{bootse}{
 logical indicating whether or not bootstrap standard errors of equating should be returned (default is \code{FALSE})
@@ -35,7 +38,7 @@ further arguments passed to or from other methods (see below for details)
 \details{
 For the random groups design \code{x} and \code{y} are separate frequency tables where each row contains a score scale point and the total number of examinees obtaining that score. For the nonequivalent groups design each row contains a score scale point on \code{x} or \code{y}, a score scale point on the anchor test, and the total number of examinees obtaining that score combination (see \code{\link{freqtab}} for details). When equating output is supplied for \code{y}, no other arguments are required and scores from \code{x} are converted directly to the scale indicated in \code{y}. In this case \code{x} must be a vector of scores.
 
-Four equating types are currently supported: mean, linear, and equipercentile, as described by Kolen and Brennan (2004), and circle-arc equating, as described by Livingston and Kim (2009). The equating design is implied by the \code{method} argument, where \code{"none"} (default) indicates that no method is needed (because examinees taking forms X and Y are assumed to be equivalent). The Tucker, Levine observed score, Levine true score, frequency estimation, Braun/Holland, and chained equating methods are supported for the nonequivalent groups with anchor test design. All but the Levine true score and chained method rely on a \dQuote{synthetic} distribution of scores (Braun and Holland, 1982), a weighted combination of \code{x} and \code{y}.
+Four equating types are currently supported: mean, linear, and equipercentile, as described by Kolen and Brennan (2004), and circle-arc equating, as described by Livingston and Kim (2009). The equating design is implied by the \code{method} argument, where \code{NA} (default) indicates that no method is needed (because examinees taking forms X and Y are assumed to be equivalent). The nominal weights, Tucker, Levine observed score, Levine true score, frequency estimation, Braun/Holland, and chained equating methods are supported for the nonequivalent groups with anchor test design. All but the Levine true score and chained method rely on a \dQuote{synthetic} distribution of scores (Braun and Holland, 1982), a weighted combination of \code{x} and \code{y}.
 
 Depending on the equating method, the following additional arguments may be required:
 \describe{
@@ -61,7 +64,7 @@ two vectors, each of length 2, specifying the coordinates for the low and high p
 string used to specify the type of chained linear equating used to obtain the midpoint in circle-arc equating, whether \code{"mean"} (default) or \code{"linear"}
 }
 }
-For equipercentile equating under the random groups design, three smoothing options are available: \code{"bump"} and \code{"average"} (see \code{\link{freqbump}} and \code{\link{freqavg}}) require the additional argument \code{jmin} and loglinear smoothing (\code{"loglin"}) requires the score functions \code{xscorefun} and \code{yscorefun} (see \code{\link{loglinear}}). For frequency estimation and chained methods, only smoothing methods \code{"freqbump"} and \code{"loglin"} are supported.
+For equipercentile equating under the random groups design, three smoothing options are available: \code{"bump"} and \code{"average"} (see \code{\link{freqbump}} and \code{\link{freqavg}}) require the additional argument \code{jmin}, and loglinear smoothing (\code{"loglin"}) requires the score functions \code{xscorefun} and \code{yscorefun} (see \code{\link{loglinear}}). For frequency estimation and chained methods, only smoothing methods \code{"freqbump"} and \code{"loglin"} are supported.
 
 The parameter \code{Ky} is used to obtain form Y equivalents of form X scores with percentile ranks of 100. Typically \code{Ky} is set to be the number of score points in the form Y scale, which assumes that scores are integers ranging from 1 (or 0) to the total number of items, and that each item is scored correct/incorrect. Scores on other scales (such as scales which include negative values, or which exclude zero) may also be used. In such cases \code{Ky} can be set to the highest possible score on form Y, or alternatively the highest observed score on Y. Specifying \code{Ky = "maxobs"} sets Ky to the maximum observed score on Y. This may be useful for calculating bootstrap standard errors, where Ky would depend on the particular bootstrap sample.
 
@@ -109,39 +112,39 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 # random groups equating for (1) mean, (2) linear, 
 # (3) equipercentile, and (4) equipercentile with 
 # loglinear smoothing:
-rscale <- ACTmath[,1]
-rx <- as.freqtab(rscale,ACTmath[,2])
-ry <- as.freqtab(rscale,ACTmath[,3])
+rscale <- ACTmath[, 1]
+rx <- as.freqtab(rscale, ACTmath[, 2])
+ry <- as.freqtab(rscale, ACTmath[, 3])
 set.seed(2007)
 
-req1 <- equate(rx,ry,type="m",bootse=TRUE,reps=50)
-req2 <- equate(rx,ry,type="l",bootse=TRUE,reps=50)
-req3 <- equate(rx,ry,type="e",bootse=TRUE,reps=50)
-req4 <- equate(rx,ry,type="e",bootse=TRUE,reps=50,
-  smooth="loglin",degree=3)
+req1 <- equate(rx, ry, type = "m", bootse = TRUE, reps = 50)
+req2 <- equate(rx, ry, type = "l", bootse = TRUE, reps = 50)
+req3 <- equate(rx, ry, type = "e", bootse = TRUE, reps = 50)
+req4 <- equate(rx, ry, type = "e", bootse = TRUE, reps = 50,
+  smooth = "loglin", degree = 3)
 
 # compare equated scores:
-cbind(rscale,mean=req1$conc[,2],linear=req2$conc[,2],
-  equip=req3$conc[,2],equipS=req4$conc[,2])
+cbind(rscale, mean = req1$conc[, 2], linear = req2$conc[, 2],
+  equip = req3$conc[, 2], equipS = req4$conc[, 2])
 
 # compare boostrap standard errors:
-cbind(rscale,linear=req2$bootsee,equip=req3$bootsee,
-  equipS=req4$bootsee)
+cbind(rscale, linear = req2$bootsee, equip = req3$bootsee,
+  equipS = req4$bootsee)
 
 
 # nonequivalent groups design for (1) Tucker linear,
 # (2) frequency estimation , and (3) Braun/Holland linear
 nscale <- 0:36
 vscale <- 0:12
-nx <- freqtab(nscale,KBneat$x[,1],vscale,KBneat$x[,2])
-ny <- freqtab(nscale,KBneat$y[,1],vscale,KBneat$y[,2])
+nx <- freqtab(nscale, KBneat$x[, 1], vscale, KBneat$x[, 2])
+ny <- freqtab(nscale, KBneat$y[, 1], vscale, KBneat$y[, 2])
 
-neq1 <- equate(nx,ny,type="Linear",method="Tuck",w=1)
-neq2 <- equate(nx,ny,type="equip",method="freq",w=1)
-neq3 <- equate(nx,ny,type="linear",method="braun",w=1)
+neq1 <- equate(nx, ny, type = "Linear", method = "Tuck", w = 1)
+neq2 <- equate(nx, ny, type = "equip", method = "freq", w = 1)
+neq3 <- equate(nx, ny, type = "linear", method = "braun", w = 1)
 
 # compare equated scores:
-cbind(nscale,Tucker=neq1$conc[,2],FE=neq2$conc[,2],
-  Braun=neq3$conc[,2])
+cbind(nscale, Tucker = neq1$conc[, 2], FE = neq2$conc[, 2],
+  Braun = neq3$conc[, 2])
 }
 \keyword{methods}

@@ -46,7 +46,7 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{freqtab}}
 }
 \examples{
-xtab <- freqtab(ACTmath[,1], ACTmath[,2])
+xtab <- freqtab(ACTmath[, 1], ACTmath[, 2])
 descript(xtab)
 mean(xtab)
 
@@ -59,8 +59,8 @@ cov.freqtab(ytab); var(y)
 
 yscale <- 0:36
 vscale <- 0:12
-ny <- freqtab(yscale, KBneat$y[,1],
-  vscale, KBneat$y[,2])
-cov.freqtab(ny); cov(KBneat$y[,1], KBneat$y[,2])
+ny <- freqtab(yscale, KBneat$y[, 1],
+  vscale, KBneat$y[, 2])
+cov.freqtab(ny); cov(KBneat$y[, 1], KBneat$y[, 2])
 }
 \keyword{univar}

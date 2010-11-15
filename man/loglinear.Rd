@@ -68,30 +68,30 @@ xscale <- 50:150
 
 # smooth x preserving first 3 moments:
 xtab <- freqtab(xscale, x)
-xlog1 <- loglinear(xtab, degree=3)
-plot(xtab, cbind(xscale, xlog1$fit), col1=2, col2=4)
+xlog1 <- loglinear(xtab, degree = 3)
+plot(xtab, cbind(xscale, xlog1$fit), col1 = 2, col2 = 4)
 
 # add "teeth" and "gaps" to x:
 teeth <- c(.5, rep(c(1, 1, 1, 1, .5), 20))
-xt <- xtab[,2]*teeth
+xt <- xtab[, 2] * teeth
 cbind(xtab, xt)
 xttab <- as.freqtab(xscale, xt)
-xlog2 <- loglinear(xttab, degree=3)
+xlog2 <- loglinear(xttab, degree = 3)
 cbind(xscale, xt, xlog2$fit)
 
 # smooth xt using score functions that preserve 
 # the teeth structure (also 3 moments):
 teeth2 <- c(1, rep(c(0, 0, 0, 0, 1), 20))
 xt.fun <- cbind(xscale, xscale^2, xscale^3)
-xt.fun <- cbind(xt.fun, xt.fun*teeth2)
+xt.fun <- cbind(xt.fun, xt.fun * teeth2)
 xlog3 <- loglinear(xttab, xt.fun)
 cbind(xscale, xt, xlog3$fit)
 
-par(mfrow=c(2, 1))
-plot(xscale, xt, type="h", ylab="count",
-  main="X teeth raw")
-plot(xscale, xlog3$fit, type="h", ylab="count",
-  main="X teeth smooth")
+par(mfrow = c(2, 1))
+plot(xscale, xt, type = "h", ylab = "count",
+  main = "X teeth raw")
+plot(xscale, xlog3$fit, type = "h", ylab = "count",
+  main = "X teeth smooth")
 
 # bivariate example, preserving first 3 moments of total
 # and v (anchor) each of x and y, and the covariance
@@ -99,21 +99,21 @@ plot(xscale, xlog3$fit, type="h", ylab="count",
 # see equated scores in Wang (2009), Table 4
 xscale <- 0:36
 vscale <- 0:12
-xvtab <- freqtab(xscale, KBneat$x[,1],
-  vscale, KBneat$x[,2])
-yvtab <- freqtab(xscale, KBneat$y[,1],
-  vscale, KBneat$y[,2])
-Y <- yvtab[,1]
-V <- yvtab[,2]
-scorefun <- cbind(Y, Y^2, Y^3, V, V^2, V^3, V*Y)
-wang09 <- equate(xvtab, yvtab, type="equip", method="chained",
-  smooth="loglin", xscorefun=scorefun, 
-  yscorefun=scorefun)
+xvtab <- freqtab(xscale, KBneat$x[, 1],
+  vscale, KBneat$x[, 2])
+yvtab <- freqtab(xscale, KBneat$y[, 1],
+  vscale, KBneat$y[, 2])
+Y <- yvtab[, 1]
+V <- yvtab[, 2]
+scorefun <- cbind(Y, Y^2, Y^3, V, V^2, V^3, V * Y)
+wang09 <- equate(xvtab, yvtab, type = "equip",
+  method = "chained", smooth = "loglin", xscorefun = scorefun, 
+  yscorefun = scorefun)
 wang09$concordance
 
 # replicate Moses and von Davier, 2006, univariate example:
 uv <- c(0, 4, 11, 16, 18, 34, 63, 89, 87, 129, 124,
   154, 125, 131, 109, 98, 89, 66, 54, 37, 17)
-loglinear(as.freqtab(0:20, uv), degree=3)
+loglinear(as.freqtab(0:20, uv), degree = 3)
 }
 \keyword{smooth}
