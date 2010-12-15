@@ -10,8 +10,8 @@ The equate package contains functions for non-IRT equating under both random gro
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 1.1-0\cr
-Date: \tab 2010-11-15\cr
+Version: \tab 1.1-1\cr
+Date: \tab 2010-12-15\cr
 Depends: \tab R (>= 2.10.0)\cr
 License: \tab GPL (>= 2)\cr
 }

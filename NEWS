@@ -1,3 +1,13 @@
+equate_1.1-1 (2010-12-15)
+
+  o New equating type: synthetic,
+    a combination of any other equating type and
+    identity equating
+
+  o Circle-arc equating fixed
+
+  o skew.freqtab and kurt.freqtab fixed
+
 equate_1.1-0 (2010-11-15)
 
   o plot.freqtab updated

@@ -13,7 +13,7 @@
 This function equates test scores under the random groups and nonequivalent groups with anchor test designs.
 }
 \usage{
-equate(x, y, type, method = NA, name = NULL, bootse = FALSE, ...)
+equate(x, y, type, method = NA, name = NULL, ident = 0, bootse = FALSE, ...)
 }
 \arguments{
   \item{x, y}{
@@ -27,6 +27,9 @@ string specifying the equating method, where \code{NA} (default) indicates equat
 }
   \item{name}{
 An optional name, used to label the output
+}
+  \item{ident}{
+value between 0 (default) and 1 specifying the proportional representation of the identity function in the equating function.
 }
   \item{bootse}{
 logical indicating whether or not bootstrap standard errors of equating should be returned (default is \code{FALSE})
@@ -58,7 +61,7 @@ value between 0 and 1 specifying the weight applied to form X scores (and implic
 logical indicating whether or not to use levine true score (hence \dQuote{lts}) equating. Default is \code{FALSE}
 }
   \item{\code{lowp}, \code{highp}}{
-two vectors, each of length 2, specifying the coordinates for the low and high points used in circle-arc equating. \code{lowp} defaults to the minimums of the X and Y scales. \code{highp} defaults to the number of items, i.e., the maximum possible scores
+two vectors, each of length 2, recycled if necessary, specifying the coordinates for the low and high points used in circle-arc equating. \code{lowp} defaults to the minimums of the X and Y scales. \code{highp} defaults to the number of items, i.e., the maximum possible scores
 }
   \item{\code{midp}}{
 string used to specify the type of chained linear equating used to obtain the midpoint in circle-arc equating, whether \code{"mean"} (default) or \code{"linear"}

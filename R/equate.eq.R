@@ -1,5 +1,5 @@
 equate.eq <- function(x, y, method = NA, Ky = max(y[, 1]),
-  w = 1, smoothmeth = "none", jmin, xscorefun, yscorefun,
+  w = -1, smoothmeth = "none", jmin, xscorefun, yscorefun,
   verbose = FALSE, ...) {
 
   nc <- ncol(x)

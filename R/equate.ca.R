@@ -1,16 +1,17 @@
-equate.ca <- function(x, y, type, method = NA, lowp,
-  midp = "mean", highp, verbose = FALSE, ...) {
+equate.ca <- function(x, y, method = NA, lowp, midp = "mean",
+  highp, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
   yscale <- unique(y[, 1])
 
   x1 <- ifelse(missing(lowp), min(xscale), lowp[1])
-  y1 <- ifelse(missing(lowp), min(yscale), lowp[2])
+  y1 <- ifelse(missing(lowp), min(yscale), lowp[length(lowp)])
   x3 <- ifelse(missing(highp), max(xscale), highp[1])
-  y3 <- ifelse(missing(highp), max(yscale), highp[2])
+  y3 <- ifelse(missing(highp), max(yscale), highp[length(highp)])
+  index <- xscale >= x1 & xscale <= x3
   slope <- (y3 - y1)/(x3 - x1)
   intercept <- y1 - slope * x1
-  lin <- slope * xscale + intercept
+  lin <- cyx <- slope * xscale + intercept
 
   x2 <- mean(x)
   method <- match.arg(tolower(method),
@@ -38,10 +39,11 @@ equate.ca <- function(x, y, type, method = NA, lowp,
   r <- sqrt((xcent - x1)^2 + ycent^2)
 
   if(y2star < 0)
-    cyx <- lin + (ycent - sqrt((r^2) - (lin - xcent)^2))
+    cyx[index] <- lin[index] + ycent -
+      sqrt((r^2) - (lin[index] - xcent)^2)
   else
-    cyx <- lin + (ycent + sqrt((r^2) - (lin - xcent)^2))
-
+    cyx[index] <- lin[index] + ycent +
+      sqrt((r^2) - (lin[index] - xcent)^2)
   out <- cyx
   if(verbose) {
     out <- list(yx = cyx)

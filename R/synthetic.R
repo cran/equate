@@ -1,4 +1,4 @@
-synthetic <- function(x, y, w = 1, method, internal = TRUE,
+synthetic <- function(x, y, w = -1, method, internal = TRUE,
   lts = FALSE) {
 
   xscale <- unique(x[, 1])

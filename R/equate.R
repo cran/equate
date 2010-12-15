@@ -1,5 +1,5 @@
 equate <- function(x, y, type, method = NA, name = NULL,
-  bootse = FALSE, ...) {
+  ident = 0, bootse = FALSE, ...) {
 
   if(class(y) == "equate") {
     if(y$type == "equipercentile") {
@@ -19,7 +19,7 @@ equate <- function(x, y, type, method = NA, name = NULL,
     }
     else out <- y$coef[2] * x + y$coef[1]
     names(out) <- NULL
-    return(out)
+    return((1 - y$ident) * out + y$ident * x)
   }
 
   type <- match.arg(tolower(type),
@@ -34,6 +34,8 @@ equate <- function(x, y, type, method = NA, name = NULL,
   ycount <- tapply(y[, ncol(x)], y[, 1], sum)
   xtab <- as.freqtab(xscale, xcount)
   ytab <- as.freqtab(xscale, ycount)
+  eqout$yx[1:length(xscale)] <-
+    (1 - ident) * eqout$yx[1:length(xscale)] + ident * xscale
   yx <- as.freqtab(eqout$yx[1:length(xscale)], xcount)
 
   out <- list(name = name, type = type,
@@ -49,6 +51,7 @@ equate <- function(x, y, type, method = NA, name = NULL,
     fx = fx(xtab), ycount = ycount, fy = fx(ytab))
   out$yxtab <- yx
   out$concordance <- cbind(scale = xscale, yx = eqout$yx)
+  out$ident <- ident
   out <- c(out, eqout[-1])
   if(bootse) {
     out$bootsee <- se.boot(x = x, y = y, eqfun = eqfun,

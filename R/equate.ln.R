@@ -1,5 +1,5 @@
 equate.ln <- function(x, y, type = "linear", method = NA,
-  w = 1, internal = TRUE, lts = FALSE, verbose = FALSE, ...) {
+  w = -1, internal = TRUE, lts = FALSE, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
   type <- match.arg(tolower(type), c("mean", "linear"))
