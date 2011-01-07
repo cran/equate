@@ -43,32 +43,32 @@ synthetic <- function(x, y, w = -1, method, internal = TRUE,
     covyv <- cov.freqtab(y)
 
     if(method == "nominal weights")
-      slope1 <- slope2 <- max(vscale)/max(xscale)
-    if(method == "tucker") {
-      slope1 <- covxv/varxv
-      slope2 <- covyv/varyv
+      g1 <- g2 <- max(xscale)/max(vscale)
+    else if(method == "tucker") {
+      g1 <- covxv/varxv
+      g2 <- covyv/varyv
     }
     else if(method == "levine" & internal) {
-      slope1 <- varx/covxv
-      slope2 <- vary/covyv
+      g1 <- varx/covxv
+      g2 <- vary/covyv
     }
     else if(method == "levine" & !internal) {
-      slope1 <- (varx + covxv)/(varxv + covxv)
-      slope2 <- (vary + covyv)/(varyv + covyv)
+      g1 <- (varx + covxv)/(varxv + covxv)
+      g2 <- (vary + covyv)/(varyv + covyv)
     }
     if(!lts) {
-      msx <- mx - (yw * slope1 * (mxv - myv))
-      msy <- my + (w * slope2 * (mxv - myv))
+      msx <- mx - (yw * g1 * (mxv - myv))
+      msy <- my + (w * g2 * (mxv - myv))
       sdsx <- sqrt(varx -
-        (yw * (slope1^2) * (varxv - varyv)) +
-        (w * yw * (slope1^2) * (mxv - myv)^2))
+        (yw * (g1^2) * (varxv - varyv)) +
+        (w * yw * (g1^2) * (mxv - myv)^2))
       sdsy <- sqrt(vary +
-        (w * (slope2^2) * (varxv - varyv)) +
-        (w * yw * (slope2^2) * (mxv - myv)^2))
+        (w * (g2^2) * (varxv - varyv)) +
+        (w * yw * (g2^2) * (mxv - myv)^2))
     }
   }
   if(lts)
-    out <- list(gamma = c(slope1, slope2))
+    out <- list(gamma = c(g1, g2))
   else {
     out <- list(synthstats = rbind(xs = c(msx, sdsx),
       ys = c(msy, sdsy)))

@@ -8,7 +8,7 @@
 
 \title{Statistical Equating Methods}
 \author{Anthony Albano}
-\date{March 25, 2010}
+\date{January 7, 2011}
 
 \newcommand{\eqnspace}{\hspace{.5in}}
 \newcommand{\code}[1]{\texttt{#1}}
@@ -21,7 +21,7 @@
 \renewenvironment{Schunk}{\begin{quote}\small\singlespace}{\end{quote}}
 \maketitle
 \begin{abstract}
-\noindent The R package \package{equate} \cite{albano2010equate} contains functions for non-IRT equating under random groups and nonequivalent groups designs. This package vignette introduces these designs and provides an overview of statistical equating with details about each of the supported equating methods. Examples demonstrate the basic functionality of the package.
+\noindent The R package \package{equate} \cite{albano2011equate} contains functions for non-IRT equating under random groups and nonequivalent groups designs. This package vignette introduces these designs and provides an overview of statistical equating with details about each of the supported equating methods. Examples demonstrate the basic functionality of the package.
 \end{abstract}
 
 
@@ -47,9 +47,9 @@ As noted above, the equivalent groups is the simpler equating design. The tradit
 
 \section{Equating Types and Methods}
 \subsection*{Types of Equating}
-Equatings with the equivalent groups design, that is, equatings in their simplest and most general form, are referred to here and in the \package{equate} package as equating \emph{types}. These can be categorized as either linear, including mean and linear equating, or nonlinear, equipercentile equating. An additional nonlinear type supported in the \package{equate} package is circle-arc equating, as introduced by \citeA{livingston2009circle}.
+Equatings with the equivalent groups design, that is, equatings in their simplest and most general form, are referred to here and in the \package{equate} package as equating \emph{types}. These can be categorized as either linear, including mean and linear equating, or nonlinear, equipercentile equating. An additional nonlinear type supported in the \package{equate} package is circle-arc equating, as described by \citeA{livingston2009circle}.
 
-\subsubsection{*Identity equating}
+\subsubsection*{Identity equating}
 The identity equating function simply reproduces the original score value unchanged, and thus un-equated:
 \begin{equation}
   id_Y(x_i) = x_i. \label{eqn:ident}
@@ -58,7 +58,7 @@ With small samples, and when test forms are believed to be parallel, identity eq
 \begin{equation}
   s_Y(x_i) = (w_I - 1)g_Y(x_i) + w_Iid_Y(x_i), \label{eqn:synthetic}
 \end{equation}
-where $s_Y(x_i)$ is a weighted combination of the general equating function $g_Y(x_i)$ and the identity, and $w_I$ is a value between zero and one.
+where $s_Y(x_i)$ is a weighted combination of the generic equating function $g_Y(x_i)$ with the identity, and $w_I$ is a value between zero and one.
 
 \subsubsection*{Linear equating}
 Linear equating defines a linear relationship between scores from forms $X$ and $Y$, based on the mean and standard deviation of each. In other words, the standardized deviation scores, or z-scores, are set equal for all score points $i$:
@@ -90,7 +90,7 @@ Equipercentile equating defines a nonlinear relationship between score scales by
 Because it involves estimation at each score point, equipercentile equating is especially susceptible to random sampling error. Smoothing methods are typically used to reduce irregularities in either the score distributions or the equating function itself. Two commonly used smoothing methods include polynomial loglinear presmoothing \cite{holland2000univariate} and cubic-spline postsmoothing \cite{kolen1984effectiveness}. The \package{equate} package currently supports loglinear presmoothing (see Appendix \ref{sec:appendLoglin} for details).
 
 \subsubsection*{Circle-arc equating}
-Circle-arc equating also defines a nonlinear relationship between score scales, but it requires the estimation of only three points for forms $X$ and $Y$: the lowest meaningful score ($x_1, y_1$) which for a multiple-choice test could be the lowest score expected by chance; a midpoint, based on the center (e.g., means) of each form ($x_2, y_2$); and the maximum possible score on each form ($x_3, y_3$). The low and high points define the linear component of the function:
+Circle-arc equating also defines a nonlinear relationship between score scales, but it utilizes only three points for forms $X$ and $Y$: the lowest meaningful score ($x_1, y_1$), which for a multiple-choice test could be the lowest score expected by chance; a midpoint ($x_2, y_2$), based on the center (e.g., means) of each form; and the maximum possible score on each form ($x_3, y_3$). Only the midpoint requires estimation. The low and high points define the linear component of the function:
 \begin{equation}
   lin_Y(x_i) = y_1 + \frac{y_3 - y_1}{x_3 - x_1}(x_i - x_1). \label{eqn:ca1}
 \end{equation}
@@ -102,10 +102,10 @@ where the second quantity, under the square root, is added to $y_c$ if $y_{2*}$ 
 \begin{equation}
   c_Y(x_i) = lin_y(x_i) + arc_y(x_i). \label{eqn:ca3}
 \end{equation}
-Equations for the center points and radius of the circle are included in Appendix \ref{sec:appendCirc}. \citeA{livingston2009circle} provide a complete description of the process using helpful graphics.
+Equations for the center points and radius of the circle are included in Appendix \ref{sec:appendCirc}. \citeA{livingston2009circle} provide a complete description of the process.
 
 \subsection*{Equating Methods}
-The nonequivalent groups design requires that information from anchor items be incorporated into the functions and parameter estimation described above. This is necessary because two populations are involved in the nonequivalent groups design: population 1 taking form $X$, and 2 taking form $Y$; however, the equating function itself will be defined for a single population. Since this population is only a hypothetical one, that is, no data exist for it, it is referred to as the \emph{synthetic population} \cite{braun1982observed}. As described by \citeA{kolen2004test}, the linear equating function from equation \eqref{eqn:lin2} can be rewritten in terms of the synthetic population as follows:
+The nonequivalent groups design requires that information from anchor items be incorporated into the functions and parameter estimation described above. This is necessary because two populations are involved in the nonequivalent groups design: population 1 taking form $X$, and population 2 taking form $Y$; however, the equating function itself will be defined for a single population. Since this population is only a hypothetical one, that is, no data exist for it, it is referred to as the \emph{synthetic population} \cite{braun1982observed}. As described by \citeA{kolen2004test}, the linear equating function from equation \eqref{eqn:lin2} can be rewritten in terms of the synthetic population as follows:
 \begin{equation}
   l_{Y_S}(x_i) = \frac{\hat{\sigma}_S(Y)}{\hat{\sigma}_S(X)}x_i - \frac{\hat{\sigma}_S(Y)}{\hat{\sigma}_S(X)}\hat{\mu}_S(X) + \hat{\mu}_S(Y). \label{eqn:synthlin}
 \end{equation}
@@ -121,7 +121,7 @@ and for the variances,
 \end{align}
 In these equations the weights $w_1$ and $w_2$ sum to 1, and are used to specify the desired influence of populations 1 and 2 in the estimation. The $\gamma$ terms represent the relationship between total scores on $X$ and $Y$ and the respective anchor test scores on $V$ (described further below). As is clear, $\gamma_1$ and $\gamma_2$ are used along with the weights to adjust the $\hat{\mu}$ and $\hat{\sigma}^2$ terms for $X$ and $Y$ in order to obtain corresponding estimates for the synthetic population. For example, setting $w_1 = 0$ and $w_2 = 1$ will force $\hat{\mu}_S(Y)$ to equal $\hat{\mu}_2(Y)$, and conversely $\hat{\mu}_2(X)$ will be adjusted the maximum amount to obtain $\hat{\mu}_S(X)$. The same would occur with the estimation of synthetic variances. Furthermore, the adjustments would be completely removed if $\hat{\mu}_1(V) = \hat{\mu}_2(V)$ and $\hat{\sigma}_1^2(V) = \hat{\sigma}_2^2(V)$.
 
-A variety of techniques have been developed for estimating the $\gamma$ terms required by equations \eqref{eqn:synthmean1}-\eqref{eqn:synthsd2} above. These techniques are referred to here as equating \emph{methods}. The \package{equate} package currently supports the Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating methods \cite[provide a full explanation of the assumptions related to each method, including derivations]{kolen2004test}. Table \ref{tab:typesmethods} shows the supported methods that apply to each equating type.
+A variety of techniques have been developed for estimating the $\gamma$ terms required by equations \eqref{eqn:synthmean1}-\eqref{eqn:synthsd2}. These techniques are referred to here as equating \emph{methods}. The \package{equate} package currently supports the Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating methods \cite[provide a full explanation of the assumptions related to each method, including derivations]{kolen2004test}. Table \ref{tab:typesmethods} shows the supported methods that apply to each equating type.
 
 \subsubsection*{Tucker equating}
 In Tucker equating the relationship between total and anchor test scores is defined in terms of regression slopes, where $\gamma_1$ is the slope resulting from the regression of $X$ on $V$ for population 1, and $\gamma_2$ the slope from a regression of $Y$ on $V$ for population 2:
@@ -375,9 +375,9 @@ Chained linear equating involves two separate linear functions. In the equations
 \end{equation}
 The second function converts $V_2$ to the scale of $Y$:
 \begin{equation}
-  l_{Y}(v_{2i}) = \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}v_2i - \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_2) + \hat{\mu}(Y).
+  l_{Y}(v_{2i}) = \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}v_{2i} - \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_2) + \hat{\mu}(Y).
 \end{equation}
-These functions are combined, where the first, $l_{V_1}(x_i)$, takes the place of $v_2i$ in the second to obtain:
+These functions are combined, where the first, $l_{V_1}(x_i)$, takes the place of $v_{2i}$ in the second to obtain:
 \begin{equation}
   lchain_{Y}(x_i) = \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)} \left[\frac{\hat{\sigma}(V_1)}{\hat{\sigma}(X)}x_i - \frac{\hat{\sigma}(V_1)}{\hat{\sigma}(X)}\hat{\mu}(X) + \hat{\mu}(V_1)\right] - \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_2) + \hat{\mu}(Y),
 \end{equation}
@@ -392,11 +392,11 @@ Finally, for chained mean equating this reduces to:
 
 When used to obtain the midpoint coordinates in circle-arc equating, the chained method reduces even further, since $x_i$ is $\hat{\mu}(X)$. Here, the linear and mean functions simplify to
 \begin{equation}
-  lchain_{Y}(x_i) = \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_1) - \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_2) + \hat{\mu}(Y),
+  lchain_{Y}(\hat{\mu}(X)) = \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_1) - \frac{\hat{\sigma}(Y)}{\hat{\sigma}(V_2)}\hat{\mu}(V_2) + \hat{\mu}(Y),
 \end{equation}
 and
 \begin{equation}
-  mchain_{Y}(x_i) = \hat{\mu}(V_1) - \hat{\mu}(V_2) + \hat{\mu}(Y).
+  mchain_{Y}(\hat{\mu}(X)) = \hat{\mu}(V_1) - \hat{\mu}(V_2) + \hat{\mu}(Y).
 \end{equation}
 
 \subsection{Loglinear Presmoothing}
@@ -413,7 +413,7 @@ An acceptable degree of smoothing is typically achieved by comparing multiple mo
 
 \subsection{Circle-Arc Equating}
 \label{sec:appendCirc}
-The circle-arc in circle-arc equating is a section of the circle that is defined by the distance of the three points ($x_1, y_1$), ($x_2, y_2$), and ($x_3, y_3$) from the line $lin_Y(x)$. Since the low and high points define the line $lin_Y(x)$, they reduce to ($x_1, 0$) and ($x_3, 0$). The new midpoint is identified as ($x_2, y_{2*}$). These three points are used to determine the coordinates $x_c$ and $y_c$ for the center of the circle:
+The circle-arc in circle-arc equating is a section of the circle that is defined by the vertical distance of the three points ($x_1, y_1$), ($x_2, y_2$), and ($x_3, y_3$) from the line $lin_Y(x)$. Since the low and high points define the line $lin_Y(x)$, they reduce to ($x_1, 0$) and ($x_3, 0$). The new midpoint is identified as ($x_2, y_{2*}$). These three points are used to determine the coordinates $x_c$ and $y_c$ for the center of the circle:
 \begin{equation}
   x_c = \frac{(x_3^2-x_1^2)}{2(x_3-x_1)}, \label{eqn:xc}
 \end{equation}
@@ -424,7 +424,7 @@ These center points are then used to obtain the radius
 \begin{equation}
   r^2 = (x_1-x_c)^2 + (y_{1*}-y_c)^2. \label{eqn:circle}
 \end{equation}
-Since $y_{1*} = 0$ ($x_3$ and $y_3$ could also be used) this reduces to
+Since $y_{1*} = 0$ ($x_3$ and $y_{3*}$ could also be used) this reduces to
 \begin{equation}
   r = \sqrt{(x_1-x_c)^2 + (y_c)^2}. \label{eqn:radius}
 \end{equation}

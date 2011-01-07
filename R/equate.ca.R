@@ -1,5 +1,5 @@
-equate.ca <- function(x, y, method = NA, lowp, midp = "mean",
-  highp, verbose = FALSE, ...) {
+equate.ca <- function(x, y, type, method = NA, lowp,
+  midp = "mean", highp, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
   yscale <- unique(y[, 1])
