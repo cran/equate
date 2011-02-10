@@ -1,8 +1,10 @@
-equate.ca <- function(x, y, type, method = NA, lowp,
+equate.ca <- function(x, y, type, method = NA, ident = 0, lowp,
   midp = "mean", highp, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
   yscale <- unique(y[, 1])
+  xcount <- as.vector(tapply(x[, ncol(x)], x[, 1], sum))
+  ycount <- as.vector(tapply(y[, ncol(x)], y[, 1], sum))
 
   x1 <- ifelse(missing(lowp), min(xscale), lowp[1])
   y1 <- ifelse(missing(lowp), min(yscale), lowp[length(lowp)])
@@ -41,12 +43,19 @@ equate.ca <- function(x, y, type, method = NA, lowp,
   if(y2star < 0)
     cyx[index] <- lin[index] + ycent -
       sqrt((r^2) - (lin[index] - xcent)^2)
-  else
+  else if(y2star > 0)
     cyx[index] <- lin[index] + ycent +
       sqrt((r^2) - (lin[index] - xcent)^2)
-  out <- cyx
+
+  cyx <- (1 - ident) * cyx + ident * xscale
+
   if(verbose) {
     out <- list(yx = cyx)
+    out$stats <- rbind(x = c(descript(x)), y = c(descript(y)),
+      yx = c(descript(as.freqtab(cyx, xcount))))
+    colnames(out$stats) <- c("mean", "sd", "skew", "kurt", "n")
+    out$freqtab <- cbind(scale = xscale, fx = fx(xcount),
+      fy = fx(ycount), xcount = xcount, ycount = ycount)
     out$coefficients <- rbind(intercept, slope, xcenter = xcent,
       ycenter = ycent, r)[,1]
     out$points <- rbind(x = c(x1, x2, x3), y = c(y1, y2, y3))
@@ -60,5 +69,6 @@ equate.ca <- function(x, y, type, method = NA, lowp,
         yvcount = tapply(y[, 3], y[, 2], sum))
     }
   }
+  else out <- cyx
   return(out)
 }

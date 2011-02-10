@@ -1,9 +1,15 @@
+equate_1.1-3 (2011-2-10)
+  o verbose option added to loglinear smoothing
+
+  o equate function updated to support conversion
+    of a vector of scores to the scale defined
+    in a previous equating
+
 equate_1.1-2 (2011-1-7)
 
   o Circle-arc equating fixed
 
   o Package vignette updated
-
 
 equate_1.1-1 (2010-12-15)
 

@@ -75,23 +75,25 @@ Standard errors are returned for the random groups design only, using equations 
 }
 \value{
 An object of class \dQuote{\code{\link{equate}}} is returned, listing the following components, some of which are conditional on the equating type, method, and smoothing:
+  \item{name}{\code{name} or \code{NULL} if not specified}
   \item{type}{equating type}
   \item{method}{equating method}
   \item{design}{equating design, inferred from the method}
+  \item{ident}{weight given to identity function}
+  \item{concordance}{conversion table containing scores on X with their form Y equivalents.}
+  \item{bootsee}{vector of bootstrap standard errors of equating}
+  \item{yx}{Form Y equivalents for each score on X}
   \item{stats}{descriptive statistics for X, Y, and YX (equated scores) distributions}
-  \item{freqtab}{table containing the score scale, frequencies, and the cumulative distribution functions for forms X and Y}
-  \item{yxtab}{frequency table, of class \dQuote{freqtab}, for equated scores}
-  \item{concordance}{conversion table containing scores on X with their form Y equivalents. For the random groups design a column of standard errors is included}
+  \item{freqtab}{table containing the score scale, cumulative distribution functions, frequencies, and smoothed frequencies for forms X and Y}
   \item{coefficients}{conversion coefficients intercept and slope. Center points of circle and radius are also included for circle-arc equating}
   \item{points}{X and Y coordinates for low, middle, and high points used in circle-arc equating}
-  \item{synthstats}{means and standard deviations for the synthetic distributions}
   \item{w}{weight applied to X in synthetic estimation}
-  \item{synthtab}{frequency table for the synthetic distribution, used in frequency estimation equipercentile equating}
   \item{anchorstats}{descriptive statistics for the anchor distributions}
   \item{anchortab}{frequency table for the anchor distributions}
+  \item{synthstats}{means and standard deviations for the synthetic distributions}
+  \item{synthtab}{frequency table for the synthetic distribution, used in frequency estimation equipercentile equating}
   \item{smoothmethod}{smoothing method}
-  \item{smoothout}{a list of smoothing output, the length of which depends on the method chosen (for loglinear smoothing this list can be extremely long)}
-  \item{bootsee}{vector of bootstrap standard errors of equating}
+  \item{smoothout}{Smoothed frequencies for X and Y}
 }
 \references{
 Braun, H. I., and Holland, P. W. (1982). Observed-score test equating: A mathematical analysis of some ETS equating procedures. In P. W. Holland and D. B. Rubin (Eds.), \emph{Test Equating} (pp. 9--49). New York: Academic.

@@ -512,7 +512,7 @@ legend("topright",legend=c("Tucker Mean","Tucker Linear","Levine Mean",
 \nocite{skaggs2005accuracy}
 \nocite{livingston1993small}
 \newpage
-\bibliography{bibfile}
+\bibliography{equatebibfile}
 \bibliographystyle{apacite}
 
 \end{document} 

@@ -1,5 +1,5 @@
 loglinear <- function(x, scorefun, degree, raw = TRUE,
-  convergecrit = .0001, ...) {
+  convergecrit = .0001, verbose = TRUE, ...) {
 
   a.fn <- function(ab, am, antot){
     atemp <- matrix(nrow = ncol(ab), ncol = ncol(ab))
@@ -104,54 +104,57 @@ loglinear <- function(x, scorefun, degree, raw = TRUE,
     lik <- alpha * ntot + sum((t(counts) %*% b) %*% B)
   }
 
-  liksum1 <- counts/m
-  liksum1[liksum1 == 0] <- 1
-  liksum2 <- log(liksum1)
-  likchisquare <- 2 * (t(counts) %*% liksum2)
-  aic <- likchisquare + 2 * (ncol(b) + 1)
-  caic <- likchisquare + (1 + log(ntot)) * (ncol(b) + 1)
-  pearsonchisquare <- sum((counts - m)^2/m)
-  freemantukeychisquare <-
-    sum((sqrt(counts) + sqrt(counts + 1) - sqrt(4 * m + 1))^2)
-  dfree <- length(counts) - ncol(b) - 1
-  output$modelfit <- rbind(likchisquare, pearsonchisquare,
-    freemantukeychisquare, aic, caic, dfree)
-  rownames(output$modelfit) <- c("Likelihood Ratio Chi-square",
-    "Pearson Chi-square", "Freeman-Tukey Chi-square",
-    "AIC", "CAIC", "Degrees of Freedom")
+  if(verbose) {
+    liksum1 <- counts/m
+    liksum1[liksum1 == 0] <- 1
+    liksum2 <- log(liksum1)
+    likchisquare <- 2 * (t(counts) %*% liksum2)
+    aic <- likchisquare + 2 * (ncol(b) + 1)
+    caic <- likchisquare + (1 + log(ntot)) * (ncol(b) + 1)
+    pearsonchisquare <- sum((counts - m)^2/m)
+    freemantukeychisquare <-
+      sum((sqrt(counts) + sqrt(counts + 1) - sqrt(4 * m + 1))^2)
+    dfree <- length(counts) - ncol(b) - 1
+    output$modelfit <- rbind(likchisquare, pearsonchisquare,
+      freemantukeychisquare, aic, caic, dfree)
+    rownames(output$modelfit) <- c("Likelihood Ratio Chi-square",
+      "Pearson Chi-square", "Freeman-Tukey Chi-square",
+      "AIC", "CAIC", "Degrees of Freedom")
 
-  a <- a.fn(usb, m, ntot)
-  B2 <- B/sqrt(bssq)
-  stdbeta <- tryCatch(sqrt(diag(solve(a, ...))),
-    error = function(x) NA)
-  output$rawbetas <- cbind(B2, stdbeta)
-  colnames(output$rawbetas) <- c("beta", "se")
-  output$alpha <- -log(sum(exp(usb %*% B2)))
-  output$iterations <- iter
+    a <- a.fn(usb, m, ntot)
+    B2 <- B/sqrt(bssq)
+    stdbeta <- tryCatch(sqrt(diag(solve(a, ...))),
+      error = function(x) NA)
+    output$rawbetas <- cbind(B2, stdbeta)
+    colnames(output$rawbetas) <- c("beta", "se")
+    output$alpha <- -log(sum(exp(usb %*% B2)))
+    output$iterations <- iter
 
-  mf <- m/sum(m)
-  sqm <- sqrt(mf)
-  ones <- matrix(1, nrow = nrow(b), ncol = 1)
+    mf <- m/sum(m)
+    sqm <- sqrt(mf)
+    ones <- matrix(1, nrow = nrow(b), ncol = 1)
 
-  QR <- matrix(nrow = nrow(b), ncol = ncol(b))
-  for(i in 1:ncol(b)){
-    qrsum <- 0
-    for(j in 1:nrow(b))
-      qrsum <- qrsum + b[j, i] * mf[j]
-    for(k in 1:nrow(b))
-      QR[k, i] <- sqrt(mf[k]) * (b[k, i] - qrsum)
+    QR <- matrix(nrow = nrow(b), ncol = ncol(b))
+    for(i in 1:ncol(b)){
+      qrsum <- 0
+      for(j in 1:nrow(b))
+        qrsum <- qrsum + b[j, i] * mf[j]
+      for(k in 1:nrow(b))
+        QR[k, i] <- sqrt(mf[k]) * (b[k, i] - qrsum)
+    }
+    Q <- qr(QR)$qr[, 1:ncol(b)]
+    Nt <- 1/sqrt(ntot)
+    Cmat <- matrix(nrow = nrow(b), ncol = ncol(b))
+    for(i in 1:nrow(b))
+      Cmat[i,] <- Nt * sqm[i] * Q[i,]
+
+    ftres <- sqrt(counts) + sqrt(counts + 1) - sqrt(4 * m + 1)
+    output$fitted.values <- m
+    output$residuals <- ftres
+    output$cmatrix  <- Cmat
+    colnames(output$cmatrix) <- colnames(scorefun)
+    output$scorefun <- scorefun
   }
-  Q <- qr(QR)$qr[, 1:ncol(b)]
-  Nt <- 1/sqrt(ntot)
-  Cmat <- matrix(nrow = nrow(b), ncol = ncol(b))
-  for(i in 1:nrow(b))
-    Cmat[i,] <- Nt * sqm[i] * Q[i,]
-
-  ftres <- sqrt(counts) + sqrt(counts + 1) - sqrt(4 * m + 1)
-  output$fitted.values <- m
-  output$residuals <- ftres
-  output$cmatrix  <- Cmat
-  colnames(output$cmatrix) <- colnames(scorefun)
-  output$scorefun <- scorefun
+  else output$fitted.values <- m
   return(output)
 }

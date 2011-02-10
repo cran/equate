@@ -47,6 +47,9 @@ equipercentile <- function(x, y, Ky = max(y[, 1])) {
       yx[i] <- mean(c(yx[i], yxtemp))
     }
   }
-  if(!xn) return(yx)
-  else return(cbind(yx = yx, se = se))
+
+  out <- list(yx = yx)
+  if(xn)
+    out$se <- se
+  return(out)
 }

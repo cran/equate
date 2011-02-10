@@ -1,11 +1,15 @@
-equate.ln <- function(x, y, type = "linear", method = NA,
+equate.ln <- function(x, y, type = "linear", ident = 0, method = NA,
   w = -1, internal = TRUE, lts = FALSE, verbose = FALSE, ...) {
 
   xscale <- unique(x[, 1])
+  yscale <- unique(y[, 1])
+  xcount <- as.vector(tapply(x[, ncol(x)], x[, 1], sum))
+  ycount <- as.vector(tapply(y[, ncol(x)], y[, 1], sum))
   type <- match.arg(tolower(type), c("mean", "linear"))
   method <- match.arg(tolower(method),
     c(NA, "nominal weights", "tucker", "levine", "chained",
       "braun/holland"))
+
   if(is.na(method)) {
     slope <-
       ifelse(type == "mean", 1, sd.freqtab(y)/sd.freqtab(x))
@@ -35,14 +39,22 @@ equate.ln <- function(x, y, type = "linear", method = NA,
         stats[2] * (mean.freqtab(x[, -1]) - mean.freqtab(y[, -1]))
     }
   }
+
   yx <- slope * xscale + intercept
+  yx <- (1 - ident) * yx + ident * xscale
 
   if(verbose) {
     out <- list(yx = yx)
+    out$stats <- rbind(x = c(descript(x)), y = c(descript(y)),
+      yx = c(descript(as.freqtab(yx, xcount))))
+    colnames(out$stats) <- c("mean", "sd", "skew", "kurt", "n")
+    out$freqtab <- cbind(scale = xscale, fx = fx(xcount),
+      fy = fx(ycount), xcount = xcount, ycount = ycount)
     out$coefficients <- rbind(intercept, slope)[, 1]
     if(is.na(method))
-      out$yx <- cbind(yx = yx, se = se.ln(x, y))
+      out$se <- se.ln(x, y)
     else {
+      out$w <- w
       if(method != "chained" & !lts)
         out$synthstats <- stats
       out$anchorstats <- rbind(descript(x[, -1]),

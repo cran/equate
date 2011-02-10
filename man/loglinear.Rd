@@ -5,7 +5,7 @@
 This function smooths univariate and bivariate score distributions via polynomial loglinear modeling (Holland & Thayer, 2000; Moses & von Davier, 2006).
 }
 \usage{
-loglinear(x, scorefun, degree, raw = TRUE, convergecrit = .0001, ...)
+loglinear(x, scorefun, degree, raw = TRUE, convergecrit = .0001, verbose = TRUE, ...)
 }
 \arguments{
   \item{x}{
@@ -22,6 +22,9 @@ logical. If \code{TRUE} (default), raw polynomials will be used, if \code{FALSE}
 }
   \item{convergecrit}{
 convergence criteria used in maximum likelihood estimation (default is .0001)
+}
+  \item{verbose}{
+logical, with default \code{TRUE}, indicating whether or not output in addition to the fitted values should be returned
 }
   \item{\dots}{
 further arguments passed to or from other methods
