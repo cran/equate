@@ -56,7 +56,7 @@ The identity equating function simply reproduces the original score value unchan
 \end{equation}
 With small samples, and when test forms are believed to be parallel, identity equating, or no equating, has been recommended over other types \cite{kolen2004test}. The identity function can also be combined with any of the functions described below to obtain the synthetic equating function \cite{kim2008small}:
 \begin{equation}
-  s_Y(x_i) = (w_I - 1)g_Y(x_i) + w_Iid_Y(x_i), \label{eqn:synthetic}
+  s_Y(x_i) = (1 - w_I)g_Y(x_i) + w_Iid_Y(x_i), \label{eqn:synthetic}
 \end{equation}
 where $s_Y(x_i)$ is a weighted combination of the generic equating function $g_Y(x_i)$ with the identity, and $w_I$ is a value between zero and one.
 
@@ -291,7 +291,7 @@ equate(act.x, act.y, type = "mean")
 @
 Summary statistics and the intercept and slope are printed (for a full description of available output see \code{?equate}). The nonequivalent groups design is requested by specifying an equating \code{method}:
 <<print=TRUE>>=
-neat.e.c <- equate(neat.x, neat.y, type = "equip",
+neat <- equate(neat.x, neat.y, type = "equip",
   method = "chained")
 @
 Table \ref{tab:typesmethods} above summarizes the equating methods that apply to each equating type in the nonequivalent groups design. For convenience, these may all be specified in the \code{equate} function using only the first letter, as in \code{type="c"} for circle-arc equating. Levine true-score equating (\code{lts}) is requested by including the additional argument \code{lts=TRUE}.
@@ -299,9 +299,9 @@ Table \ref{tab:typesmethods} above summarizes the equating methods that apply to
 The \code{equate} function can also be used to convert scores from one scale to another based on the function from a previous equating. For example, scores on $Y$ for a few more examinees taking \code{KBneat} form $X$ could be obtained:
 <<>>=
 cbind(newx = c(3, 29, 8, 7, 13),
-  yx = equate(x = c(3, 29, 8, 7, 13), y = neat.e.c))
+  yx = equate(x = c(3, 29, 8, 7, 13), y = neat))
 @
-Here, the argument \code{y} passed to \code{equate} is the chained equipercentile equating from above, which is an object of class \code{"equate"}. The \code{equate} function recognizes it as such and attempts to perform the conversion. Note that since the equating function from \code{neat.e.c} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees \code{newx}.
+Here, the argument \code{y} passed to \code{equate} is the chained equipercentile equating from above, which is an object of class \code{"equate"}. The \code{equate} function recognizes it as such and attempts to perform the conversion. Note that since the equating function from \code{neat} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees \code{newx}.
 
 \subsection*{Comparing Equatings}
 There are many considerations involved in choosing a type and method for equating two test forms \cite<see>[ch. 8]{kolen2004test}. However, sample size is paramount, as statistical equating involves the estimation of different numbers of parameters, and accurate estimation depends on adequate and representative samples. As shown above, each equating type and method creates an equating function using different estimates of the score distributions. The equated equivalent at a given score point can vary substantially across equating methods, and within a single equating method across examinee samples.

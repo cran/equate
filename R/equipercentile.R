@@ -4,7 +4,7 @@ equipercentile <- function(x, y, Ky = max(y[, 1])) {
   yscale <- unique(y[, 1])
   yn <- sum(y[, 2])
   if(class(x) != "freqtab") {
-    prank <- x
+    prank <- sort(unique(x))
     xscale <- yscale
     xn <- 0
   }
@@ -48,8 +48,12 @@ equipercentile <- function(x, y, Ky = max(y[, 1])) {
     }
   }
 
-  out <- list(yx = yx)
-  if(xn)
+  if(xn){
+    out <- list(yx = yx)
     out$se <- se
+  }
+  else
+    out <- list(yx = yx[match(x, prank)])
+
   return(out)
 }

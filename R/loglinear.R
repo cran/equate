@@ -1,7 +1,7 @@
 loglinear <- function(x, scorefun, degree, raw = TRUE,
   convergecrit = .0001, verbose = TRUE, ...) {
 
-  a.fn <- function(ab, am, antot){
+  a.fn <- function(ab, am, antot) {
     atemp <- matrix(nrow = ncol(ab), ncol = ncol(ab))
     for(i in 1:ncol(ab)){
       for(j in 1:ncol(ab)){

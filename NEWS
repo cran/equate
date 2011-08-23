@@ -1,4 +1,15 @@
+equate_1.1-4 (2011-8-23)
+
+  o Package vignette updated
+
+  o Print method fixed
+
+  o equate function fixed for equipercentile
+    conversion of a vector of scores to the scale
+    defined in a previous equating
+
 equate_1.1-3 (2011-2-10)
+
   o verbose option added to loglinear smoothing
 
   o equate function updated to support conversion
