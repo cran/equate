@@ -5,14 +5,14 @@
 Statistical Methods for Test Score Equating
 }
 \description{
-The equate package contains functions for non-IRT equating under both random groups and nonequivalent groups with anchor test designs. Mean, linear, equipercentile and circle-arc equating are supported, as are methods for univariate and bivariate presmoothing of score distributions. Specific equating methods currently supported include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating.
+The equate package contains functions for non-IRT equating under both equivalent and nonequivalent groups with anchor test designs. Mean, linear, equipercentile and circle-arc equating are supported, as are methods for univariate and bivariate presmoothing of score distributions. Specific equating methods currently supported include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating.
 }
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 1.1-4\cr
-Date: \tab 2011-8-23\cr
-Depends: \tab R (>= 2.10.0)\cr
+Version: \tab 1.2-0\cr
+Date: \tab 2013-9-20\cr
+Depends: \tab R (>= 3.0.0)\cr
 License: \tab GPL (>= 2)\cr
 }
 
@@ -20,12 +20,14 @@ Index:
 \preformatted{
 ACTmath                 ACT Mathematics Test Scores
 KBneat                  Test Scores under a NEAT design
+PISAusa                 Programme for International Student Assessment 2009 USA Data
 descript                Descriptive Statistics for a Frequency Table
 equate                  Statistical Equating
 freqavg                 Frequency Adjusting and Averaging
 freqtab                 Frequency Tabulation
 loglinear               Loglinear Smoothing
 plot.freqtab            Plotting of Frequency Distributions
+plot.equate             Plotting of Equating Functions
 px                      Percentile Rank and Cumulative Distribution
                         Functions
 se.boot                 Bootstrap Standard Errors of Equating

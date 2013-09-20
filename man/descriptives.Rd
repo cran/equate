@@ -9,31 +9,33 @@
 \alias{cov.freqtab}
 \title{Descriptive Statistics for a Frequency Table}
 \description{
-The functions \code{mean.freqtab}, \code{sd.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, skewness, and kurtosis for a frequency table of class \dQuote{\code{\link{freqtab}}}. \code{descript} returns all four of these values along with the number of observations.
+The functions \code{mean.freqtab}, \code{sd.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, skewness, and kurtosis for a frequency table of class \dQuote{\code{\link{freqtab}}}.
+
+\code{descript} returns all four of these values along with the number of observations.
 
 \code{min.freqtab} and \code{max.freqtab} return the minimum and maximum.
 
 \code{cov.freqtab} returns the variance of a univariate frequency table and the covariance of a bivariate.
 }
 \usage{
-mean.freqtab(x, ...)
+\method{mean}{freqtab}(x, ...)
 sd.freqtab(x)
 skew.freqtab(x)
 kurt.freqtab(x)
 descript(x)
-min.freqtab(x, ..., na.rm = FALSE)
-max.freqtab(x, ..., na.rm = FALSE)
+\method{min}{freqtab}(x, ..., na.rm = FALSE)
+\method{max}{freqtab}(x, ..., na.rm = FALSE)
 cov.freqtab(x)
 }
 \arguments{
   \item{x}{
-two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. If \code{x} is a three-column bivariate frequency table, only the first distribution is used, except with \code{cov.freqtab} (see examples)
+two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. If \code{x} is a three-column bivariate frequency table, only the first distribution is used, except with \code{cov.freqtab} (see examples).
 }
   \item{\dots}{
-further arguments passed to or from other methods
+further arguments passed to or from other methods.
 }
   \item{na.rm}{
-logical indicating whether or not missing values should be removed
+logical indicating whether missing values should be removed, currently ignored since frequency tables cannot contain missing values.
 }
 }
 \value{
@@ -46,21 +48,19 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{freqtab}}
 }
 \examples{
-xtab <- freqtab(ACTmath[, 1], ACTmath[, 2])
+xtab <- as.freqtab(ACTmath[, 1:2])
 descript(xtab)
 mean(xtab)
 
 set.seed(2008)
 y <- round(rnorm(100, 100, 10))
-ytab <- freqtab(70:130, y)
+ytab <- freqtab(y, xscale = 70:130)
 min(y); min(ytab)
 max(y); max(ytab)
 cov.freqtab(ytab); var(y)
 
-yscale <- 0:36
-vscale <- 0:12
-ny <- freqtab(yscale, KBneat$y[, 1],
-  vscale, KBneat$y[, 2])
+ny <- freqtab(x = KBneat$y[, 1], xscale = 0:36,
+	v = KBneat$y[, 2], vscale = 0:12)
 cov.freqtab(ny); cov(KBneat$y[, 1], KBneat$y[, 2])
 }
 \keyword{univar}

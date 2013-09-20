@@ -1,3 +1,25 @@
+equate_1.2-0 (2013-9-20)
+  
+  o Package vignette updated
+  
+  o freqtab function updated to accept item response
+    data
+    
+  o loglinear function updated - original estimation
+    algorithm has been dropped, and the function is
+    now a wrapper for 'glm'
+    
+  o new function plot.equate, for plotting and
+    comparing equating results
+    
+  o equate and other functions modified to handle
+    linking of forms with different score scales
+  
+  o Bug fixed in the frequency estimation method,
+    where marginal frequencies are zero 
+  
+  o Help files updated
+
 equate_1.1-4 (2011-8-23)
 
   o Package vignette updated

@@ -6,7 +6,7 @@
 These functions provide simple methods for smoothing score distributions, typically ones with unobserved score points, prior to performing equipercentile equating. \code{freqbump} smooths by adding a small relative frequency to each score while adjusting the probabilities to sum to one (see Kolen and Brennan, 2004, p. 48). \code{freqavg} replaces frequencies falling below a specified threshold with an average of adjacent values (see Moses and Holland, 2008).
 }
 \usage{
-freqbump(x, jmin = 10^-6, Kx = max(x[,1]))
+freqbump(x, jmin = 1e-6, Kx = max(x[,1]))
 freqavg(x, jmin = 1)
 }
 \arguments{
@@ -14,7 +14,7 @@ freqavg(x, jmin = 1)
 two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. For \code{freqbump}, \code{x} can also be a bivariate frequency table.
 }
   \item{jmin}{
-for \code{freqbump}, the frequency to be added to each score point (default is 10^-6)
+for \code{freqbump}, the frequency to be added to each score point (default is 1e-6)
 for \code{freqavg}, the minimum frequency, as an integer, below which frequencies will be replaced (default is 1)
 }
   \item{Kx}{
@@ -38,8 +38,7 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \examples{
 set.seed(2005)
 x <- round(rnorm(1000, 100, 10))
-xscale <- 70:130
-xtab <- freqtab(xscale, x)
+xtab <- freqtab(x, xscale = 70:130)
 
 xavg <- freqavg(xtab)
 xbump <- freqbump(xtab)

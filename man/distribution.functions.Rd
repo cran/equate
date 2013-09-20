@@ -6,15 +6,15 @@
 \code{px} returns the percentile ranks and \code{fx} the cumulative frequencies for each score point in a frequency distribution.
 }
 \usage{
-px(x,y)
+px(x, y)
 fx(x)
 }
 \arguments{
   \item{x}{
-two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. For \code{px}, \code{x} can also be a vector of score points (see details)
+two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. For \code{px}, \code{x} can also be a vector of score points
 }
   \item{y}{
-optional frequency distribution of class \dQuote{\code{\link{freqtab}}} (see details)
+optional frequency distribution of class \dQuote{\code{\link{freqtab}}}
 }
 }
 \details{
@@ -27,7 +27,7 @@ optional frequency distribution of class \dQuote{\code{\link{freqtab}}} (see det
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
-x <- freqtab(0:40, ACTmath[, 2])
+x <- freqtab(ACTmath[, 2], xscale = 0:40)
 px(x)
 fx(x)
 px(c(8.2, 40, 41), x)

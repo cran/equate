@@ -3,28 +3,33 @@
 \alias{as.freqtab}
 \title{Frequency Tabulation}
 \description{
-\code{freqtab} creates a frequency table for a vector, or vectors, of scores. \code{as.freqtab} converts to class \dQuote{\code{freqtab}}
+\code{freqtab} creates a frequency table for a vector, or vectors, of scores. \code{as.freqtab} converts to class \dQuote{\code{freqtab}}.
 }
 \usage{
-freqtab(xscale, x, vscale, v)
-as.freqtab(xscale, x)
+freqtab(x, v, xitems = 1:ncol(x), vitems = 1:ncol(v),
+	xscale, vscale, na.rm = TRUE)
+as.freqtab(x)
 }
 \arguments{
-  \item{xscale}{
-the score scale for form X, as a vector
+  \item{x, v}{
+either vectors of total scores, one per examinee, or matrices of item responses with which total scores will be calculated. \code{x} refers to the total test, and \code{v} refers to the anchor test. See below for details.
 }
-  \item{x}{
-vector of scores (one per examinee) on items in form X (see details for other options)
+  \item{xitems, vitems}{
+vectors of column numbers or names with which total scores will be computed for \code{x} and \code{v} when they contain item responses.
 }
-  \item{vscale}{
-the score scale for form V, as a vector
+  \item{xscale, vscale}{
+the score scales for forms X and V, as vectors.
 }
-  \item{v}{
-vector of scores (one per examinee) for form X examinees on items in form V (i.e., the anchor test)
+  \item{na.rm}{
+logical with default \code{TRUE} specifying whether or not missing item responses should be ignored, i.e., treated as 0, when calculating total scores.
 }
 }
 \details{
-If \code{x} is a vector of scores, one per examinee, values are factored with \code{levels = xscale}. This ensures that unobtained scores (i.e., scores not in \code{x}) will still be represented in the tabulation. If \code{x} is a two-column matrix, \code{as.freqtab} serves to simply change its class to \dQuote{\code{freqtab}}, as required by \code{\link{equate}}. In this case the first column should contain the score scale and the second column the number of examinees obtaining each score. Alternatively, both \code{xscale} and \code{x} can be included in \code{as.freqtab}, with the same result.
+With \code{freqtab}, if \code{x} and \code{v} are vectors of total scores, one per examinee, they will be factored with \code{levels = xscale}. This ensures that unobtained scores (i.e., scores not in \code{x} or \code{v}) will still be represented in the frequency tabulation.
+
+When \code{x} is a matrix with at least two columns, total scores are calculated for each row across the columns specified in \code{xitems}. The same is true for \code{v} and \code{vitems}. If \code{x} and \code{vitems} are supplied but \code{v} is not, \code{x} is assumed to contain item responses for the anchor items as well.
+
+\code{as.freqtab} serves to simply change a frequency table \code{x} to class \dQuote{\code{freqtab}}, as required by \code{\link{equate}}. The first column in \code{ftab} should contain the score scale. For a univariate distribution, the second column should contain the numbers of examinees obtaining each score in column 1. For a bivariate distribution, the second column in \code{ftab} should contain the anchor test score scale, and the third column the number of examinees obtaining each score combination.
 }
 \value{
 In the univariate case (i.e., form V is not specified) a two-column matrix is returned, where column 1 contains the score scale and column 2 the frequency for each scale value. In the bivariate case a three-column matrix is returned where columns 1 and 2 contain all combinations of form X score scale points (in column 1) and score scale points on the anchor test (in column 2), and column 3 contains the total number of examinees obtaining the corresponding score combination.
@@ -39,15 +44,11 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 set.seed(2005)
 x1 <- round(rnorm(1000, 100, 10))
 x1scale <- 70:130
-freqtab(x1scale, x1)
+freqtab(x = x1, xscale = x1scale)
 
-x2 <- ACTmath[, 2]
-x2scale <- ACTmath[, 1]
-as.freqtab(x2scale, x2)
+as.freqtab(ACTmath[, 1:2])
 
-xscale <- 0:36
-vscale <- 0:12
-freqtab(xscale, KBneat$x[, 1],
-  vscale, KBneat$x[, 2])
+freqtab(x = KBneat$x[, 1], v = KBneat$x[, 2],
+	xscale = 0:36, vscale = 0:12)
 }
-\keyword{utilities}
+\keyword{methods}

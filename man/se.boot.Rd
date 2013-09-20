@@ -6,7 +6,7 @@ This function returns the standard deviation of equated scores over multiple rep
 }
 \usage{
 se.boot(x, y, xn = sum(x[,ncol(x)]), yn = sum(y[,ncol(y)]), 
-  reps = 100, eqfun, returnboots = FALSE, ...)
+	reps = 100, eqfun, returnboots = FALSE, ...)
 }
 \arguments{
   \item{x, y}{
@@ -40,8 +40,8 @@ Returns either a vector of standard deviations, one per score scale point, or a 
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
-xtab <- freqtab(0:36, KBneat$x[, 1])
-ytab <- freqtab(0:36, KBneat$y[, 1])
+xtab <- freqtab(KBneat$x[, 1], xscale = 0:36)
+ytab <- freqtab(KBneat$y[, 1], xscale = 0:36)
 se.boot(xtab, ytab, reps = 100, eqfun = "equate.ln")
 }
 \keyword{methods}

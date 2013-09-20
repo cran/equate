@@ -1,9 +1,13 @@
-as.freqtab <- function(xscale, x = NULL) {
-  ftab <- cbind(xscale, x)
-  class(ftab) <- "freqtab"
-  if(ncol(ftab) == 3)
-    colnames(ftab) <- c("x", "v", "count")
-  else colnames(ftab) <- c("x", "count")
-  rownames(ftab) <- NULL
-  return(ftab)
+as.freqtab <- function(x) {
+
+	if(ncol(x) == 3)
+		colnames(x) <- c("x", "v", "count")
+	else if(ncol(x) == 2)
+		colnames(x) <- c("x", "count")
+	else
+		stop("incorrect number of columns")
+	rownames(x) <- NULL
+	class(x) <- "freqtab"
+
+	return(x)
 }
