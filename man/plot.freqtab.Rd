@@ -1,61 +1,72 @@
 \name{plot.freqtab}
 \alias{plot.freqtab}
-\title{Plotting of Frequency Distributions}
+\alias{points.freqtab}
+\alias{bfreqplot}
+\alias{ufreqplot}
+\title{Plotting Frequency Distributions}
 \description{
-This function plots univariate and bivariate frequency tables of class \dQuote{\code{\link{freqtab}}}
+This function plots univariate and bivariate frequency tables of class \dQuote{\code{\link{freqtab}}}.
 }
 \usage{
-\method{plot}{freqtab}(x, y, col1 = "gray27", col2 = "gray74",
-	type = "h", pch=16, yoffset = 0.3, ...)
+\method{plot}{freqtab}(x, y = NULL, xcol = 1, ycol, pch = 16,
+  ylty = 1, xlab = "Total Test", addlegend = !missing(y),
+  legendtext, ...)
+
+\method{points}{freqtab}(x, xcol = 1, pch = 16, ...)
 }
 \arguments{
   \item{x}{
 univariate or bivariate score distribution of class \dQuote{\code{\link{freqtab}}}.
 }
   \item{y}{
-univariate score distribution, either as an object of class \dQuote{\code{\link{freqtab}}} or a vector of frequencies, to be added to the plot of univariate \code{x} (see details).
+either an object of class \dQuote{\code{\link{freqtab}}}, where frequencies will be extracted, or a vector or matrix of frequencies, to be added to the plot of \code{x}. See below for details.
 }
-  \item{col1}{
-color of lines used in plotting univarite \code{x}, and in plotting both variables in bivariate \code{x}.
-}
-  \item{col2}{
-color of lines used in plotting \code{y}.
-}
-  \item{type}{
-character vector describing the type of plot to be drawn when \code{x} is univariate, where \code{type[1]} is used for plotting \code{x} and \code{type[2]} for plotting \code{y}. The default \code{"h"} plots a vertical line for each frequency. \code{type} is recycled if necessary.
+  \item{xcol, ycol}{
+colors used in plotting \code{x} and \code{y}.
 }
   \item{pch}{
-plotting point (see \code{\link{par}}) used in bivariate scatterplot.
+plotting symbol used to plot bivariate points.
 }
-  \item{yoffset}{
-integer indicating amount of offset when plotting vertical lines (i.e., \code{type[2] == "h"}) for \code{y}, expressed in terms of \code{x} scale points.
+  \item{ylty}{
+line type used to plot frequencies in \code{y}.
+}
+  \item{xlab}{
+label for the x axis.
+}
+  \item{addlegend}{
+logical indicating whether or not a legend should be added.
+}
+  \item{legendtext}{
+character vector of text to be passed to the \code{legend} argument of the \code{legend} function, defaulting to column names used in \code{y}.
 }
   \item{\dots}{
-further arguments passed to or from other methods, such as graphical parameters besides \code{col}.
+further arguments passed to or from other methods, such as graphical parameters besides \code{col}, \code{type}, and \code{pch}.
 }
 }
 \details{
-When \code{x} is bivariate, e.g., coming from one form of a nonequivalent groups equating design, \code{y} is ignored. Otherwise \code{x} and \code{y} are assumed to be on similar scales, where \code{x} determines the x-axis.
+For the points method, a scatterplot for \code{x} is added to the current opened plot.
 
-Colors must be specified using \code{col1} and \code{col2}.
+For the plot method, when \code{x} is univariate, i.e, having 2 columns, a frequency plot is created for \code{x}. When \code{x} is bivariate, e.g., coming from a single group equating design or one form of a nonequivalent groups design, a scatterplot is produced with frequency plots for the marginal distributions.
+
+\code{y} is used to superimpose lines, e.g., smoothed frequencies, over the (marginal) frequencies of \code{x}.
+
+Colors must be specified using \code{xcol} and \code{ycol}. When \code{ycol} is missing, a vector of colors is created using \code{rainbow(ncol(y))}.
 }
 \value{
-The univariate option produces a single, simple, line plot of \code{type="h"}. The bivariate option produces a scatterplot with a marginal barplot for each distribution.
+The univariate option produces a single line plot of \code{type = "h"}. Frequencies from \code{y} are then superimposed. The bivariate option produces a scatterplot with a marginal frequency plot for each distribution.
 }
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \seealso{
-\code{\link{plot.table}}, \code{\link{lines}}
+\code{\link{plot.table}}, \code{\link{plot.equate}}, \code{\link{lines}}, \code{\link{points}}
 }
 \examples{
-neat.xv <- freqtab(KBneat$x[, 1], KBneat$x[, 2],
-	xscale = 0:36, vscale = 0:12)
-plot(neat.xv)
+x <- freqtab(KBneat$x[, 1], KBneat$x[, 2],
+  xscale = 0:36, vscale = 0:12)
+plot(x)
 
-neat.x <- freqtab(KBneat$x[, 1], xscale = 0:36)
-neat.v <- freqtab(KBneat$x[, 2], vscale = 0:12)
-plot(neat.x, neat.v, lwd = 2)
-plot(neat.x, neat.v, lwd = 2, type = "l")
+xs <- loglinear(x, degree = 4, xdegree = 1, stepup = TRUE)
+plot(x, xs[c(3:4, 7:9)], lwd = 2)
 }
 \keyword{misc}

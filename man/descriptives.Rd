@@ -1,4 +1,5 @@
 \name{descriptives}
+\alias{summary.freqtab}
 \alias{descript}
 \alias{mean.freqtab}
 \alias{sd.freqtab}
@@ -7,29 +8,35 @@
 \alias{max.freqtab}
 \alias{min.freqtab}
 \alias{cov.freqtab}
-\title{Descriptive Statistics for a Frequency Table}
+\alias{cor.freqtab}
+\alias{px}
+\alias{fx}
+\title{Descriptive Statistics for Frequency Tables}
 \description{
-The functions \code{mean.freqtab}, \code{sd.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, skewness, and kurtosis for a frequency table of class \dQuote{\code{\link{freqtab}}}.
-
-\code{descript} returns all four of these values along with the number of observations.
-
-\code{min.freqtab} and \code{max.freqtab} return the minimum and maximum.
-
-\code{cov.freqtab} returns the variance of a univariate frequency table and the covariance of a bivariate.
+These functions return descriptive statistics for a frequency table of class \dQuote{\code{\link{freqtab}}}.
 }
 \usage{
+\method{summary}{freqtab}(object, ...)
+
 \method{mean}{freqtab}(x, ...)
+
 sd.freqtab(x)
+
 skew.freqtab(x)
+
 kurt.freqtab(x)
-descript(x)
+
 \method{min}{freqtab}(x, ..., na.rm = FALSE)
+
 \method{max}{freqtab}(x, ..., na.rm = FALSE)
+
 cov.freqtab(x)
+
+cor.freqtab(x)
 }
 \arguments{
-  \item{x}{
-two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. If \code{x} is a three-column bivariate frequency table, only the first distribution is used, except with \code{cov.freqtab} (see examples).
+  \item{object, x}{
+two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. If \code{x} is a three-column bivariate frequency table, \code{summary}, \code{cov.freqtab}, and \code{cor.freqtab} will utilize both variables, otherwise, only the first is used (see examples).
 }
   \item{\dots}{
 further arguments passed to or from other methods.
@@ -38,8 +45,11 @@ further arguments passed to or from other methods.
 logical indicating whether missing values should be removed, currently ignored since frequency tables cannot contain missing values.
 }
 }
+\details{
+\code{mean.freqtab}, \code{sd.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, skewness, and kurtosis. \code{min.freqtab} and \code{max.freqtab} return the maximum and minimum observed scores. \code{cov.freqtab} and \code{cor.freqtab} return the covariance and correlation for a bivariate frequency table.
+}
 \value{
-\code{descript} returns a vector which includes the mean, standard deviation, skewness, kurtosis, and number of observations. Otherwise a vector of length one is returned.
+\code{summary} returns a data frame of summary statistics, including the mean, standard deviation, skewness, kurtosis, minimum, maximum, and number of observations for each variable in \code{x}. Otherwise, a vector of length one is returned with the corresponding statistic.
 }
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
@@ -48,19 +58,13 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{freqtab}}
 }
 \examples{
-xtab <- as.freqtab(ACTmath[, 1:2])
-descript(xtab)
-mean(xtab)
+x <- as.freqtab(ACTmath[, 1:2])
+summary(x)
 
-set.seed(2008)
-y <- round(rnorm(100, 100, 10))
-ytab <- freqtab(y, xscale = 70:130)
-min(y); min(ytab)
-max(y); max(ytab)
-cov.freqtab(ytab); var(y)
-
-ny <- freqtab(x = KBneat$y[, 1], xscale = 0:36,
-	v = KBneat$y[, 2], vscale = 0:12)
-cov.freqtab(ny); cov(KBneat$y[, 1], KBneat$y[, 2])
+y <- freqtab(KBneat$y[, 1], KBneat$y[, 2],
+  xscale = 0:36, vscale = 0:12)
+summary(y)
+cov.freqtab(y)
+cov(KBneat$y[, 1], KBneat$y[, 2])
 }
 \keyword{univar}

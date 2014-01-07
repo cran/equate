@@ -1,156 +1,225 @@
 \name{equate}
 \alias{equate}
-\alias{equate.ln}
-\alias{equate.eq}
-\alias{equate.ca}
+\alias{equate.default}
+\alias{equate.list}
+\alias{equate.freqtab}
+\alias{summary.equate}
+\alias{summary.equate.list}
+\alias{as.equate}
+\alias{is.equate}
+\alias{as.equate.list}
+\alias{is.equate.list}
+\alias{[.equate.list}
+\alias{convert}
+\alias{linear}
 \alias{equipercentile}
+\alias{circlearc}
+\alias{equip}
 \alias{synthetic}
-\alias{se.eq}
-\alias{se.ln}
 \alias{print.equate}
-\title{Statistical Equating}
+\alias{print.summary.equate}
+\alias{center}
+\alias{circle}
+\alias{circ}
+\alias{radius}
+\alias{lin}
+\alias{syntheticequip}
+\title{Observed Score Linking and Equating}
 \description{
-This function equates test scores under the equivalent groups and nonequivalent groups with anchor test designs.
+This function links the scale of \code{x} to the scale of \code{y} for the single-group, equivalent-groups, and nonequivalent-groups with anchor test designs.
 }
 \usage{
-equate(x, y, type, method = NA, name = NULL, ident = 0,
-	bootse = FALSE, ...)
+\method{equate}{default}(x, y, ...)
+
+\method{equate}{freqtab}(x, y, type = c("identity", "mean", "linear",
+  "general linear", "circle-arc", "equipercentile"),
+  method = c("none", "nominal weights", "tucker", "levine",
+  "frequency estimation", "chained", "braun/holland"),
+  name, lowp, highp, boot = FALSE, verbose = TRUE, ...)
+
+\method{equate}{list}(x, args, ...)
 }
 \arguments{
   \item{x, y}{
-score distributions of class \dQuote{\code{\link{freqtab}}} for forms X and Y. These may be univariate or bivariate distributions (see below for details). Alternatively, if \code{y} is an object of class \dQuote{\code{\link{equate}}} (the output of a previous equating) and \code{x} a vector of scores, the equating function from \code{y} is used to convert scores in \code{x} to the Y scale.
+for the default method, \code{x} must be a vector of scores and \code{y} an object of class \dQuote{\code{\link{equate}}}, the output of a previous equating. The standard usage is to provide \code{x} as a frequency table of class \dQuote{\code{\link{freqtab}}}, where \code{y} is also a frequeny table, and \code{x} is equated to \code{y}; if \code{y} is missing, a single-group design is assumed. Finally, \code{x} may be a list of two or more frequency tables, in which case the required arguments for one or more equatings are listed in \code{args}. See below for details.
 }
   \item{type}{
-the type of equating, as the string \code{"mean"}, \code{"linear"}, \code{"equipercentile"}, \code{"circle-arc"}, or abbreviations of these.
+the type of equating. See below for details.
 }
   \item{method}{
-string specifying the equating method, where \code{NA} (default) indicates equating under the equivalent groups design, and \code{"nominal weights"}, \code{"tucker"}, \code{"levine"}, \code{"frequency estimation"}, \code{"braun/holland"}, and \code{"chained"} (or abbreviations of these) indicate the respective methods under the nonequivalent groups design.
+the equating method, where \code{"none"} (default) indicates equating under the single-group or equivalent-groups design, and \code{"nominal weights"}, \code{"tucker"}, \code{"levine"}, \code{"frequency estimation"}, \code{"braun/holland"}, and \code{"chained"} indicate the corresponding methods under the nonequivalent groups design.
 }
   \item{name}{
-An optional name, used to label the output.
+an optional name, used to label the output. If missing, a name will be created using \code{type} and \code{method}.
 }
-  \item{ident}{
-value between 0 (default) and 1 specifying the proportional representation of the identity function in the equating function.
+  \item{lowp, highp}{
+two vectors, each of length 2, specifying the coordinates for the low and high points of the X and Y scales. \code{lowp} defaults to the minimums and \code{highp} the maximums of the scales. Recycled if necessary. When \code{lowp = "obs"} or \code{highp = "obs"}, minimum and maximum observed scores are used.
 }
-  \item{bootse}{
-logical indicating whether or not bootstrap standard errors of equating should be returned (default is \code{FALSE}).
+  \item{boot}{
+logical indicating whether or not bootstrapping should be performed. Default is \code{FALSE}. See below and the \code{\link{bootstrap}} function for details.
+}
+  \item{verbose}{
+logical, with default \code{TRUE}, indicating whether or not full output should be returned. When \code{FALSE}, only the equated scores are returned.
+}
+  \item{args}{
+list of arguments passed to \code{equate}. See below for details.
 }
   \item{\dots}{
-further arguments passed to or from other methods (see below for details).
+further arguments passed to or from other functions, including arguments specific to different equating methods. See below for details.
 }
 }
 \details{
-For the equivalent groups design \code{x} and \code{y} are separate frequency tables where each row contains a score scale point and the total number of examinees obtaining that score. For the nonequivalent groups design each row contains a score scale point on \code{x} or \code{y}, a score scale point on the anchor test, and the total number of examinees obtaining that score combination (see \code{\link{freqtab}} for details). When equating output is supplied for \code{y}, no other arguments are required and scores from \code{x} are converted directly to the scale indicated in \code{y}. In this case \code{x} must be a vector of scores.
+Equating is typically performed on two frequency tables, \code{x} and \code{y}. In this case, the scores from both are used to define the equating function that links the scale of \code{x} to \code{y}. The equivalent-groups design is assumed when \code{x} and \code{y} are separate, univariate frequency tables. The nonequivalent-groups design is assumed when a \code{method} is specified, and \code{x} and \code{y} are separate bivariate frequency tables. Finally, a single-group design is assumed when \code{x} is a bivariate frequency table (containing scores on X and Y) and \code{y} is missing.
 
-Four equating types are currently supported: mean, linear, and equipercentile, as described by Kolen and Brennan (2004), and circle-arc equating, as described by Livingston and Kim (2009). The equating design is implied by the \code{method} argument, where \code{NA} (default) indicates that no method is needed (because examinees taking forms X and Y are assumed to be equivalent). The nominal weights, Tucker, Levine observed score, Levine true score, frequency estimation, Braun/Holland, and chained equating methods are supported for the nonequivalent groups with anchor test design. All but the Levine true score and chained method rely on a \dQuote{synthetic} distribution of scores (Braun and Holland, 1982), a weighted combination of \code{x} and \code{y}.
+The single-group design currently only differs from the equivalent groups design in that presmoothing can be used to preserve bivariate moments for \code{x} and \code{y} in the single-group design, whereas in the equivalent-groups design, with \code{x} and \code{y} specified separately, presmoothing is performed separately. If presmoothing is not performed via \code{equate}, the single-group and equivalent-groups designs produce the same result.
+
+When \code{x} is a vector of scores and equating output is supplied for \code{y}, no other arguments are required. Scores from \code{x} are converted directly to the scale indicated in \code{y}. If \code{y} is a composite equating, composite equated scores will be returned based on the weighted combination of equating functions included in \code{y}.
+
+When \code{x} is a \code{list} of frequency tables, each element in \code{args} must be a named list of equating arguments. In this case, the length of \code{args} corresponds to the number of equatings that will be performed. The arguments for each equating are specified as they would be when \code{x} and \code{y} are frequency tables, except for \code{x} and \code{y}; the frequency tables to be equated are specified in \code{args} by referencing their names in the list of frequency tables. See below for examples.
+
+Six equating types are currently supported: identity, mean, linear, and equipercentile, as described by Kolen and Brennan (2004); circle-arc equating, as described by Livingston and Kim (2009); and a general linear function that extends the traditional identity, mean, and linear types. Corresponding linking methods are also supported. The equating design is implied by the \code{method} argument, where \code{"none"} (default) indicates that no method is needed (because examinees taking forms X and Y are assumed to be the same or equivalent). The nominal weights, Tucker, Levine observed score, Levine true score, frequency estimation, Braun/Holland, and chained equating methods are supported for the nonequivalent-groups with anchor test design. All but the Levine true score and chained method rely on a \dQuote{synthetic} distribution of scores (Braun and Holland, 1982), a weighted combination of \code{x} and \code{y}.
 
 Depending on the equating method, the following additional arguments may be required:
 \describe{
+  \item{\code{midp}}{
+coordinates for the midpoint of the equating line, used in general linear and circle-arc equating.
+}
+  \item{\code{cx, cy, sx, sy}}{
+parameters used in general linear equating. See below for details.
+}
+  \item{\code{wax, way, wbx, wby}}{
+weights used when finding the slope and intercept in general linear equating. See below.
+}
+  \item{\code{ws}}{
+value between 0 and 1 specifying the weight applied to form X scores (and implicitly specifying the form Y weight as \code{1 - ws}) when estimating the synthetic population. When set to -1 (the default), proportional weights are calculated for X and Y based on sample size.
+}
   \item{\code{internal}}{
-logical indicating whether or not the anchor item scores are included in the total scores. This applies only to the Levine method, as all other methods assume an internal anchor test. Default is \code{TRUE}
-}
-  \item{\code{Ky}}{
-integer, typically indicating the number of items on form Y or the maximum possible score on Y (default). This value is used in equipercentile equating for the extremes of the scale (see below)
-}
-  \item{\code{smoothmeth}}{
-string indicating one of four smoothing methods to be used in equipercentile equating: \code{"none"} (default), \code{"bump"}, \code{"average"}, and \code{"loglin"} (see below)
-}
-  \item{\code{w}}{
-value between 0 and 1 specifying the weight applied to form X scores (and implicitly specifying the form Y weight as \code{1 - w}) when estimating the synthetic population. When set to -1, proportional weights are calculated for X and Y based on sample size
+logical indicating whether or not the anchor item scores are included in the total scores. This applies only to the Levine method, as all other methods assume an internal anchor test. Default is \code{TRUE}.
 }
   \item{\code{lts}}{
-logical indicating whether or not to use levine true score (hence \dQuote{lts}) equating. Default is \code{FALSE}
+logical indicating whether or not to use levine true score (\dQuote{lts}) equating. Default is \code{FALSE}.
 }
-  \item{\code{lowp}, \code{highp}}{
-two vectors, each of length 2, recycled if necessary, specifying the coordinates for the low and high points used in circle-arc equating. \code{lowp} defaults to the minimums of the X and Y scales. \code{highp} defaults to the number of items, i.e., the maximum possible scores
+  \item{\code{smoothmethod}}{
+string indicating one of four smoothing methods to be used in equipercentile equating: \code{"none"} (default), \code{"average"}, \code{"bump"}, and \code{"loglinear"} (see below).
 }
-  \item{\code{midp}}{
-string used to specify the type of chained linear equating used to obtain the midpoint in circle-arc equating, whether \code{"mean"} (default) or \code{"linear"}
+  \item{\code{chainmidp}}{
+string specifying the type of chained linear equating used to obtain the midpoint in chained circle-arc equating, whether \code{"mean"} (default) or \code{"linear"}.
+}
+  \item{\code{simple}}{
+logical, with default \code{TRUE}, indicating whether or not simplified circle-arc equating should be used (see below).
+}
+  \item{\code{reps}}{
+the number of replications to use in bootstrapping. Passed to \code{\link{bootstrap}}.
+}
+  \item{\code{xp, yp}}{
+optional parametric distributions, as frequency tables, replacing \code{x} and \code{y} when bootstrapping.
+}
+  \item{\code{xn, yn}}{
+sample sizes to be drawn from \code{x} and \code{y}, or \code{xp} and \code{yp}, at each bootstrap replication. These default to the observed sample sizes.
+}
+  \item{\code{crit}}{
+a vector of equated scores serving as the criterion equating function when calculating bootstrap bias and RMSE; both are returned when \code{crit} is specified.
 }
 }
-For equipercentile equating under the random groups design, three smoothing options are available: \code{"bump"} and \code{"average"} (see \code{\link{freqbump}} and \code{\link{freqavg}}) require the additional argument \code{jmin}, and loglinear smoothing (\code{"loglin"}) requires the score functions \code{xscorefun} and \code{yscorefun} (see \code{\link{loglinear}}). For frequency estimation and chained methods, only smoothing methods \code{"freqbump"} and \code{"loglin"} are supported.
+General linear equating is a new approach to estimating a linear linking or equating function. The slope and intercept of the line are estimated based on multiple sources of information, including the means and standard deviations of X and Y, and other values supplied through \code{cx} and \code{cy}, representing the centrality of X and Y, and \code{sx} and \code{sy}, representing the scaling or variability of X and Y. The weights \code{wax} and \code{way} specify the proportional weighting given to the standard deviations of X and Y, and indirectly the weighting given to \code{sx} and \code{sy}, in determining the slope. \code{wbx} and \code{wby} specify the proportional weighting given to the means of X and Y, and indirectly the weighting given to \code{cx} and \code{cy}, in determining the intercept. Synthetic means and standard deviations will be used when appropriate. Chained general linear equating is not currently supported.
 
-The parameter \code{Ky} is used to obtain form Y equivalents of form X scores with percentile ranks of 100. Typically \code{Ky} is set to be the number of score points in the form Y scale, which assumes that scores are integers ranging from 1 (or 0) to the total number of items, and that each item is scored correct/incorrect. Scores on other scales (such as scales which include negative values, or which exclude zero) may also be used. In such cases \code{Ky} can be set to the highest possible score on form Y, or alternatively the highest observed score on Y. Specifying \code{Ky = "maxobs"} sets Ky to the maximum observed score on Y. This may be useful for calculating bootstrap standard errors, where Ky would depend on the particular bootstrap sample.
+For equipercentile equating under the random groups design, three smoothing options are available: \code{smoothmethod = "average"} and \code{smoothmethod = "bump"} require the additional argument \code{jmin}, and loglinear smoothing (\code{smoothmethod = "loglinear"}) requires either a score function or maximum polynomial terms. For frequency estimation and chained methods, only smoothing methods \code{"bump"} and \code{"loglinear"} are supported. See the \code{\link{presmoothing}} function for details and examples.
 
-Standard errors are returned for the equivalent groups design only, using equations derived by Lord (1982, p. 168) for equipercentile equating and Braun and Holland (1982) for linear. Bootstrap standard errors are estimated using a default of \code{reps=100} replications, sampling the maximum amount from each score distribution (controlled by the arguments \code{xn} and \code{yn}; see \code{\link{se.boot}}).
+In equipercentile equating, the high point for \code{y}, i.e., \code{highp[2]}, is used to obtain form Y equivalents of form X scores with percentile ranks of 100. Typically this is set to be the number of score points in the form Y scale, which assumes that scores are integers ranging from 1 (or 0) to the total number of items, and that each item is scored correct/incorrect. Scores on other scales (such as scales which include negative values, or which exclude zero) may also be used. In such cases \code{highp[2]} can be set to the highest possible score on form Y, or alternatively the highest observed score on Y.
+
+\code{lowp} and \code{highp} are used to define the slope and intercept of the identity linking function. When the score scales for X and Y are equivalent, the identity function is simply the unequated X scale; however, when forms differ in their scales, e.g., because of changes in content or length, the identity linking function will map X onto Y based on the low and high coordinates.
+
+The simplified approach to circle-arc equating, as demonstrated by Livingston and Kim (2009), involves combining a circle-arc with the identity function. When the low and high scores differ for the X and Y scales, this becomes the identity linking function. The linear component can be omitted, and symmetric circle-arc equating used, with \code{simple = FALSE}. The result is an equating function based only on the circle-arc that passes through the points \code{lowp}, \code{highp}, and the estimated midpoint.
+
+Analytical standard errors are not currently returned. With \code{boot = TRUE}, bootstrap standard errors are estimated using a default of \code{reps = 100} replications, sampling the maximum amount from each score distribution (controlled by the arguments \code{xn} and \code{yn}). See \code{\link{bootstrap}} for details and examples, including how to obtain bootstrap bias and RMSE.
 }
 \value{
-When \code{y} contains equating output, a vector of equated scores is returned. Otherwise, an object of class \dQuote{\code{equate}} is returned, listing the following components, some of which are conditional on the equating type, method, and smoothing:
-  \item{name}{\code{name} or \code{NULL} if not specified}
+When \code{y} contains output from an equating, a vector of equated scores is returned. Otherwise, an object of class \dQuote{\code{equate}} is returned, listing the following components, some of which are dependent on the equating type, method, and smoothing:
+  \item{name}{\code{name} for the equating}
   \item{type}{equating type}
   \item{method}{equating method}
   \item{design}{equating design, inferred from the method}
-  \item{ident}{weight given to identity function}
-  \item{concordance}{conversion table containing scores on X with their form Y equivalents.}
-  \item{bootsee}{vector of bootstrap standard errors of equating}
-  \item{yx}{Form Y equivalents for each score on X}
-  \item{stats}{descriptive statistics for X, Y, and YX (equated scores) distributions}
   \item{x, y}{original frequency tables for X and Y}
-  \item{coefficients}{conversion coefficients intercept and slope. Center points of circle and radius are also included for circle-arc equating}
-  \item{points}{X and Y coordinates for low, middle, and high points used in circle-arc equating}
-  \item{anchorstats}{descriptive statistics for the anchor distributions}
-  \item{anchortab}{frequency table for the anchor distributions}
+  \item{concordance}{conversion table containing scores on X with their form Y equivalents.}
+  \item{points}{low and high points defining the identity line, and midpoints for general linear and circle-arc equating}
+  \item{weight}{weights used in general linear equating}
+  \item{internal, lts, jmin, degree, xdegree, scorefun}{additional arguments, as supplied in \dots}
+  \item{coefficients}{conversion coefficients intercept and slope; for circle-arc equating, circle center points and radius are also included; for general linear equating, slope and intercept components are included}
+  \item{ws}{weight applied to X in synthetic estimation}
   \item{synthstats}{means and standard deviations for the synthetic distributions}
-  \item{w}{weight applied to X in synthetic estimation}
-  \item{xsynthtab, ysynthtab}{frequency tables for the synthetic distributions, used in frequency estimation equipercentile equating}
+  \item{xsynthetic, ysynthetic}{frequency tables for the synthetic distributions}
   \item{smoothmethod}{smoothing method}
-  \item{smoothout}{smoothed frequencies for X and Y}
+  \item{xsmooth, ysmooth}{smoothed frequency tables for X and Y}
+  \item{bootstraps}{list of bootstrap standard errors, and, optionally, bias and RMSE}
 }
 \references{
-Braun, H. I., and Holland, P. W. (1982). Observed-score test equating: A mathematical analysis of some ETS equating procedures. In P. W. Holland and D. B. Rubin (Eds.), \emph{Test Equating} (pp. 9--49). New York: Academic.
-
 Kolen, M. J., and Brennan, R. L. (2004). \emph{Test Equating, Scaling, and Linking}. (2nd ed.), New York: Springer.
 
 Livingston, S. A., and Kim, S. (2009). The circle-arc method for equating in small samples, \emph{Journal of Educational Measurement, 46}, 330--343.
-
-Lord, F. (1982). The standard error of equipercentile equating. \emph{Journal of Educational Statistics, 7}, 165--174.
 }
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \seealso{
-\code{\link{freqbump}}, \code{\link{freqavg}}, \code{\link{loglinear}}, \code{\link{se.boot}}
+\code{\link{freqbump}}, \code{\link{freqavg}}, \code{\link{loglinear}}, \code{\link{bootstrap}}
 }
 \examples{
-# see vignette("equatevignette") for a description of methods
+# See vignette("equatevignette") for a description of methods
 # and additional examples
 
-# random groups equating for (1) mean, (2) linear, 
-# (3) equipercentile, and (4) equipercentile with 
-# loglinear smoothing:
+# Random groups equating for (1) identity, (2) mean, 
+# (3) linear, (4) equipercentile with loglinear
+# smoothing, and (5) a composite of mean and identity
 rscale <- ACTmath[, 1]
 rx <- as.freqtab(cbind(rscale, ACTmath[, 2]))
 ry <- as.freqtab(cbind(rscale, ACTmath[, 3]))
 set.seed(2007)
 
-req1 <- equate(rx, ry, type = "m", bootse = TRUE, reps = 50)
-req2 <- equate(rx, ry, type = "l", bootse = TRUE, reps = 50)
-req3 <- equate(rx, ry, type = "e", bootse = TRUE, reps = 50)
-req4 <- equate(rx, ry, type = "e", bootse = TRUE, reps = 50,
-	smooth = "loglin", degree = 3)
+req1 <- equate(rx, ry, type = "i", boot = TRUE, reps = 50)
+req2 <- equate(rx, ry, type = "m", boot = TRUE, reps = 50)
+req3 <- equate(rx, ry, type = "l", boot = TRUE, reps = 50)
+req4 <- equate(rx, ry, type = "e", boot = TRUE, reps = 50,
+  smooth = "loglin", degree = 3)
+req5 <- composite(list(req1, req2), wc = .5, symmetric = TRUE)
 
-# compare equated scores:
-cbind(rscale, mean = req1$conc[, 2], linear = req2$conc[, 2],
-	equip = req3$conc[, 2], equipS = req4$conc[, 2])
+# Compare equating functions
+plot(req1, req2, req3, req4, req5[[1]], addident = FALSE)
 
-# compare boostrap standard errors:
-cbind(rscale, linear = req2$bootsee, equip = req3$bootsee,
-	equipS = req4$bootsee)
+# Compare boostrap standard errors
+# Bootstrapping isn't supported for composite equating
+plot(req1, req2, req3, req4, addident = FALSE, out = "se",
+  legendplace = "topleft")
 
-
-# nonequivalent groups design for (1) Tucker linear,
+# Nonequivalent groups design for (1) Tucker linear,
 # (2) frequency estimation , and (3) Braun/Holland linear
 nx <- freqtab(KBneat$x[, 1], xscale = 0:36,
 	v = KBneat$x[, 2], vscale = 0:12)
 ny <- freqtab(KBneat$y[, 1], xscale = 0:36,
 	v = KBneat$y[, 2], vscale = 0:12)
 
-neq1 <- equate(nx, ny, type = "Linear", method = "Tuck", w = 1)
-neq2 <- equate(nx, ny, type = "equip", method = "freq", w = 1)
-neq3 <- equate(nx, ny, type = "linear", method = "braun", w = 1)
+neq1 <- equate(nx, ny, type = "linear", method = "tuck", ws = 1)
+neq2 <- equate(nx, ny, type = "equip", method = "freq", ws = 1)
+neq3 <- equate(nx, ny, type = "linear", method = "braun", ws = 1)
 
-# compare equated scores:
-cbind(0:36, Tucker = neq1$conc[, 2], FE = neq2$conc[, 2],
-	Braun = neq3$conc[, 2])
+# Compare equated scores
+round(cbind(xscale = 0:36, tucker = neq1$conc$yx,
+	fe = neq2$conc$yx, braun = neq3$conc$yx), 2)
+
+# Multiple linkings using PISA reading booklet 6
+# clusters 3a, 5, 6, and 7
+r3 <- freqtab(PISA$totals$b6$r3a, xscale = 0:15)
+r5 <- freqtab(PISA$totals$b6$r5, xscale = 0:15)
+r6 <- freqtab(PISA$totals$b6$r6, xscale = 0:15)
+r7 <- freqtab(PISA$totals$b6$r7, xscale = 0:14)
+eqargs <- list(r3r5 = list(type = "linear", x = "r3", y = "r5",
+    name = "Linear Linking PISA r3 to r5"),
+  r5r6 = list(type = "linear", x = "r5", y = "r6",
+    name = "Linear Linking PISA r5 to r6"),
+  r6r7 = list(type = "linear", x = "r6", y = "r7",
+    name = "Linear Linking PISA r5 to r7"))
+req <- equate(list(r3 = r3, r5 = r5, r6 = r6, r7 = r7), eqargs)
+
+# Put PISA r3 on the scale of r7 using the linking chain
+equate(equate(req$r3r5$conc$yx, req$r5r6), req$r6r7)
 }
 \keyword{methods}

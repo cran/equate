@@ -1,261 +1,340 @@
 ### R code from vignette source 'equatevignette.Rnw'
 
 ###################################################
-### code chunk number 1: equatevignette.Rnw:212-214
+### code chunk number 1: equatevignette.Rnw:330-334
 ###################################################
 library(equate)
-head(ACTmath)
-
-
-###################################################
-### code chunk number 2: equatevignette.Rnw:217-218
-###################################################
-head(KBneat$x)
-
-
-###################################################
-### code chunk number 3: equatevignette.Rnw:221-225
-###################################################
-attach(PISA)
-head(booklets)
-head(items)
-head(totals$b1)
-
-
-###################################################
-### code chunk number 4: equatevignette.Rnw:230-233
-###################################################
 act.x <- as.freqtab(cbind(ACTmath[, 1], ACTmath[, 2]))
 act.y <- as.freqtab(cbind(ACTmath[, 1], ACTmath[, 3]))
 act.x[1:4,]
 
 
 ###################################################
-### code chunk number 5: equatevignette.Rnw:236-237
+### code chunk number 2: equatevignette.Rnw:337-338
 ###################################################
-rbind(descript(act.x), descript(act.y))
+rbind(x = summary(act.x), y = summary(act.y))
 
 
 ###################################################
-### code chunk number 6: equatevignette.Rnw:240-243
+### code chunk number 3: equatevignette.Rnw:341-346
 ###################################################
-neat.x <- freqtab(KBneat$x[, 1], KBneat$x[, 2], xscale = 0:36, vscale = 0:12)
-neat.y <- freqtab(KBneat$y[, 1], KBneat$y[, 2], xscale = 0:36, vscale = 0:12)
-neat.x[50:55,]
+neat.x <- freqtab(KBneat$x[, 1], KBneat$x[, 2],
+	xscale = 0:36, vscale = 0:12)
+neat.y <- freqtab(KBneat$y[, 1], KBneat$y[, 2],
+	xscale = 0:36, vscale = 0:12)
+neat.x[50:55, ]
 
 
 ###################################################
-### code chunk number 7: equatevignette.Rnw:248-253
+### code chunk number 4: equatevignette.Rnw:351-362
 ###################################################
-r1items <- paste(items$itemid[items$clusterid == "r1"])
-r3aitems <- paste(items$itemid[items$clusterid == "r3a"])
-r1r3a <- freqtab(students[students$book == 1, ],
-	xitems = c(r1items, r3aitems), vitems = r3aitems)
-descript(r1r3a)
+attach(PISA)
+r3items <- paste(items$itemid[items$clusterid == "r3a"])
+r6items <- paste(items$itemid[items$clusterid == "r6"])
+r5items <- paste(items$itemid[items$clusterid == "r5"])
+r7items <- paste(items$itemid[items$clusterid == "r7"])
+pisa <- freqtab(students[students$book == 6, ],
+	xitems = c(r3items, r6items),
+	vitems = c(r5items, r7items),
+	xscale = 0:31, vscale = 0:29)
+round(data.frame(summary(pisa),
+	row.names = c("r3r6", "r5r7")), 2)
 
 
 ###################################################
-### code chunk number 8: equatevignette.Rnw:256-257
+### code chunk number 5: equatevignette.Rnw:366-368
 ###################################################
-descript(freqtab(totals$b1$r1 + totals$b1$r3a, totals$b1$r3a))
+plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
+plot(neat.x)
 
 
 ###################################################
-### code chunk number 9: plotunivar
+### code chunk number 6: plotunivar
 ###################################################
-plot(x = act.x, y = act.y, lwd = 2, xlab = "Score", ylab = "Count")
+plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 
 
 ###################################################
-### code chunk number 10: plotbivar
+### code chunk number 7: plotbivar
 ###################################################
 plot(neat.x)
 
 
 ###################################################
-### code chunk number 11: equatevignette.Rnw:269-270
+### code chunk number 8: equatevignette.Rnw:378-379
 ###################################################
-cbind(act.x, avg = freqavg(act.x, jmin = 2))[1:5,]
+plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 
 
 ###################################################
-### code chunk number 12: equatevignette.Rnw:275-279
-###################################################
-neat.x.smoothout <- loglinear(neat.x, degree = 3)
-neat.xs <- as.freqtab(cbind(neat.x[, 1:2], neat.x.smoothout))
-rbind(descript(neat.x), descript(neat.xs))
-rbind(descript(neat.x[, -1]), descript(neat.xs[, -1]))
-
-
-###################################################
-### code chunk number 13: plotbivarsmooth
-###################################################
-plot(neat.xs)
-
-
-###################################################
-### code chunk number 14: equatevignette.Rnw:285-286
-###################################################
-loglinear(neat.x, degree = 3, compare = TRUE)
-
-
-###################################################
-### code chunk number 15: equatevignette.Rnw:291-292
-###################################################
-plot(x = act.x, y = act.y, lwd = 2, xlab = "Score", ylab = "Count")
-
-
-###################################################
-### code chunk number 16: equatevignette.Rnw:301-302
+### code chunk number 9: equatevignette.Rnw:388-389
 ###################################################
 plot(neat.x)
 
 
 ###################################################
-### code chunk number 17: equatevignette.Rnw:311-312
+### code chunk number 10: equatevignette.Rnw:399-406
+###################################################
+neat.xs <- presmoothing(neat.x, smooth = "log", degree = 3,
+	xdegree = 1, asfreqtab = TRUE)
+rbind(x = summary(neat.x), xs = summary(neat.xs))
+neat.xsmat <- presmoothing(neat.x, "log",
+	degree = 3, xdegree = 1, stepup = TRUE)
+plot(neat.xs)
+plot(neat.x, neat.xsmat[, c(2:3, 5:7)], ycol = 1, ylty = 1:5)
+
+
+###################################################
+### code chunk number 11: plotbivarsmooth1
 ###################################################
 plot(neat.xs)
 
 
 ###################################################
-### code chunk number 18: equatevignette.Rnw:321-322
+### code chunk number 12: plotbivarsmooth2
+###################################################
+neat.xsmat <- presmoothing(neat.x, "log",
+	degree = 3, xdegree = 1, stepup = TRUE)
+plot(neat.x, neat.xsmat[, c(2:3, 5:7)], ycol = 1, ylty = 1:5)
+
+
+###################################################
+### code chunk number 13: equatevignette.Rnw:418-419
+###################################################
+plot(neat.xs)
+
+
+###################################################
+### code chunk number 14: equatevignette.Rnw:428-429
+###################################################
+neat.xsmat <- presmoothing(neat.x, "log",
+	degree = 3, xdegree = 1, stepup = TRUE)
+plot(neat.x, neat.xsmat[, c(2:3, 5:7)], ycol = 1, ylty = 1:5)
+
+
+###################################################
+### code chunk number 15: equatevignette.Rnw:437-439
+###################################################
+presmoothing(neat.x, "log", degree = 3,
+	xdegree = 1, compare = TRUE)
+
+
+###################################################
+### code chunk number 16: equatevignette.Rnw:444-445
 ###################################################
 equate(act.x, act.y, type = "mean")
 
 
 ###################################################
-### code chunk number 19: equatevignette.Rnw:325-327
+### code chunk number 17: equatevignette.Rnw:448-450
 ###################################################
-neat <- equate(neat.x, neat.y, type = "equip",
-	method = "chained")
+neat.ef <- equate(neat.x, neat.y, type = "equip",
+	method = "frequency estimation", smoothmethod = "log")
 
 
 ###################################################
-### code chunk number 20: equatevignette.Rnw:332-334
+### code chunk number 18: equatevignette.Rnw:455-456
+###################################################
+summary(neat.ef)
+
+
+###################################################
+### code chunk number 19: equatevignette.Rnw:460-462
 ###################################################
 cbind(newx = c(3, 29, 8, 7, 13),
-	yx = equate(x = c(3, 29, 8, 7, 13), y = neat))
+	yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
 
 
 ###################################################
-### code chunk number 21: equatevignette.Rnw:342-344
+### code chunk number 20: equatevignette.Rnw:467-473
 ###################################################
-boots <- equate(act.x, act.y, type = "lin", bootse = TRUE)$bootse
-round(boots, 4)
+neat.i <- equate(neat.x, neat.y, type = "ident")
+neat.lt <- equate(neat.x, neat.y, type = "linear",
+	method = "tucker")
+neat.comp <- composite(list(neat.i, neat.lt), wc = .5,
+	symmetric = TRUE)
+plot(neat.comp, addident = FALSE)
 
 
 ###################################################
-### code chunk number 22: plotbootsee
+### code chunk number 21: plotcomposite
 ###################################################
-load("equatings.Rdata")
-plot(c(1, 37), c(0, .6), type = "n", xlab = "Score on X",
-  ylab = "SEE")
-points(neat.m.t$bootsee, col = 1, type = "l")
-points(neat.m.l$bootsee, col = 1, type = "l")
-points(neat.l.t$bootsee, col = 2, type = "l")
-points(neat.l.l$bootsee, col = 2, type = "l")
-points(neat.e.f$bootsee, col = 3, type = "l")
-points(neat.e.c$bootsee, col = 3, type = "l")
-points(neat.c.c$bootsee, col = 4, type = "l")
-points(neat.c.t$bootsee, col = 4, type = "l")
-points(neat.m.t$bootsee, col = 1, type = "p", pch = 1)
-points(neat.m.l$bootsee, col = 1, type = "p", pch = 2)
-points(neat.l.t$bootsee, col = 2, type = "p", pch = 3)
-points(neat.l.l$bootsee, col = 2, type = "p", pch = 4)
-points(neat.e.f$bootsee, col = 3, type = "p", pch = 5)
-points(neat.e.c$bootsee, col = 3, type = "p", pch = 6)
-points(neat.c.c$bootsee, col = 4, type = "p", pch = 7)
-points(neat.c.t$bootsee, col = 4, type = "p", pch = 8)
-legend("topright", legend = c("Tucker Mean", "Tucker Linear",
-	"Levine Mean", "Levine Linear", "Equip FE", "Equip Chain",
-	"Circle Chain", "Circle Tucker"),
-	col = rep(1:4, each = 2), pch = 1:8, lty = 1, bty = "n", ncol = 2)
+plot(neat.comp, addident = FALSE)
 
 
 ###################################################
-### code chunk number 23: equatevignette.Rnw:391-392
+### code chunk number 22: equatevignette.Rnw:482-483
 ###################################################
-load("equatings.Rdata")
-plot(c(1, 37), c(0, .6), type = "n", xlab = "Score on X",
-  ylab = "SEE")
-points(neat.m.t$bootsee, col = 1, type = "l")
-points(neat.m.l$bootsee, col = 1, type = "l")
-points(neat.l.t$bootsee, col = 2, type = "l")
-points(neat.l.l$bootsee, col = 2, type = "l")
-points(neat.e.f$bootsee, col = 3, type = "l")
-points(neat.e.c$bootsee, col = 3, type = "l")
-points(neat.c.c$bootsee, col = 4, type = "l")
-points(neat.c.t$bootsee, col = 4, type = "l")
-points(neat.m.t$bootsee, col = 1, type = "p", pch = 1)
-points(neat.m.l$bootsee, col = 1, type = "p", pch = 2)
-points(neat.l.t$bootsee, col = 2, type = "p", pch = 3)
-points(neat.l.l$bootsee, col = 2, type = "p", pch = 4)
-points(neat.e.f$bootsee, col = 3, type = "p", pch = 5)
-points(neat.e.c$bootsee, col = 3, type = "p", pch = 6)
-points(neat.c.c$bootsee, col = 4, type = "p", pch = 7)
-points(neat.c.t$bootsee, col = 4, type = "p", pch = 8)
-legend("topright", legend = c("Tucker Mean", "Tucker Linear",
-	"Levine Mean", "Levine Linear", "Equip FE", "Equip Chain",
-	"Circle Chain", "Circle Tucker"),
-	col = rep(1:4, each = 2), pch = 1:8, lty = 1, bty = "n", ncol = 2)
+plot(neat.comp, addident = FALSE)
 
 
 ###################################################
-### code chunk number 24: equatevignette.Rnw:487-499 (eval = FALSE)
+### code chunk number 23: equatevignette.Rnw:496-504
 ###################################################
-## # Save each of the eight equatings
-## # Note: the two equipercentile runs may be slow
-## neat.m.t <- equate(neat.x, neat.y, type = "m", method = "t", bootse=TRUE)
-## neat.m.l <- equate(neat.x, neat.y, type="m", method="l", bootse=TRUE)
-## neat.l.t <- equate(neat.x, neat.y, type="l", method="t", bootse=TRUE)
-## neat.l.l <- equate(neat.x, neat.y, type="l", method="l", bootse=TRUE)
-## neat.e.f <- equate(neat.x, neat.y, type="e", method="f", bootse=TRUE,
-## 	smooth="loglin", degree=3)
-## neat.e.c <- equate(neat.x, neat.y, type="e", method="c", bootse=TRUE,
-## 	smooth="loglin", degree=3)
-## neat.c.c <- equate(neat.x, neat.y, type="c", method="c", bootse=TRUE)
-## neat.c.t <- equate(neat.x, neat.y, type="c", method="t", bootse=TRUE)
+pisa.i <- equate(pisa, type = "ident", lowp = c(3.5, 2))
+pisa.m <- equate(pisa, type = "mean", lowp = c(3.5, 2))
+pisa.l <- equate(pisa, type = "linear", lowp = c(3.5, 2))
+pisa.c <- equate(pisa, type = "circ", lowp = c(3.5, 2))
+pisa.e <- equate(pisa, type = "equip", smooth = "log",
+	lowp = c(3.5, 2))
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
+	xpoints = pisa, morepars = list(ylim = c(0, 31)))
 
 
 ###################################################
-### code chunk number 25: equatevignette.Rnw:504-515 (eval = FALSE)
+### code chunk number 24: plotstudy2
 ###################################################
-## concordance <- cbind(
-## 	neat.m.t$conc,
-## 	neat.m.l$conc[,2],
-## 	neat.l.t$conc[,2],
-## 	neat.l.l$conc[,2],
-## 	neat.e.f$conc[,2],
-## 	neat.e.c$conc[,2],
-## 	neat.c.c$conc[,2],
-## 	neat.c.t$conc[,2])
-## colnames(concordance)[-1] <-
-## 	c("m.t","m.l","l.t","l.l","e.f","e.c","c.c","c.t")
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
+	xpoints = pisa, morepars = list(ylim = c(0, 31)))
 
 
 ###################################################
-### code chunk number 26: equatevignette.Rnw:520-541 (eval = FALSE)
+### code chunk number 25: equatevignette.Rnw:512-513
 ###################################################
-## # Plot comparing bootstrap SEE
-## plot(c(1, 37), c(0, .6), type = "n", xlab = "Score on X", ylab = "SEE")
-## points(neat.m.t$bootsee, col = 1, type = "l")
-## points(neat.m.l$bootsee, col = 1, type = "l")
-## points(neat.l.t$bootsee, col = 2, type = "l")
-## points(neat.l.l$bootsee, col = 2, type = "l")
-## points(neat.e.f$bootsee, col = 3, type = "l")
-## points(neat.e.c$bootsee, col = 3, type = "l")
-## points(neat.c.c$bootsee, col = 4, type = "l")
-## points(neat.c.t$bootsee, col = 4, type = "l")
-## points(neat.m.t$bootsee, col = 1, type = "p", pch = 1)
-## points(neat.m.l$bootsee, col = 1, type = "p", pch = 2)
-## points(neat.l.t$bootsee, col = 2, type = "p", pch = 3)
-## points(neat.l.l$bootsee, col = 2, type = "p", pch = 4)
-## points(neat.e.f$bootsee, col = 3, type = "p", pch = 5)
-## points(neat.e.c$bootsee, col = 3, type = "p", pch = 6)
-## points(neat.c.c$bootsee, col = 4, type = "p", pch = 7)
-## points(neat.c.t$bootsee, col = 4, type = "p", pch = 8)
-## legend("topright", legend = c("Tucker Mean", "Tucker Linear", "Levine Mean",
-## 	"Levine Linear", "Equip FE", "Equip Chain", "Circle Chain", "Circle Tucker"),
-## 	col = rep(1:4, each = 2), pch = 1:8, lty = 1, bty = "n", ncol = 2)
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
+	xpoints = pisa, morepars = list(ylim = c(0, 31)))
+
+
+###################################################
+### code chunk number 26: equatevignette.Rnw:530-540
+###################################################
+neat.xp <- presmoothing(neat.x, "log", xdegree = 2,
+	asfreqtab = TRUE)
+neat.xpmat <- presmoothing(neat.x, "log", xdegree = 2,
+	stepup = TRUE)
+neat.yp <- presmoothing(neat.y, "log", xdegree = 2,
+	asfreqtab = TRUE)
+neat.ypmat <- presmoothing(neat.y, "log", xdegree = 2,
+	stepup = TRUE)
+plot(neat.x, neat.xpmat[, c(3, 4, 7:10)])
+plot(neat.y, neat.ypmat[, c(3, 4, 7:10)])
+
+
+###################################################
+### code chunk number 27: plotstudy1x
+###################################################
+plot(neat.x, neat.xpmat[, c(3, 4, 7:10)])
+
+
+###################################################
+### code chunk number 28: plotstudy1y
+###################################################
+plot(neat.y, neat.ypmat[, c(3, 4, 7:10)])
+
+
+###################################################
+### code chunk number 29: equatevignette.Rnw:551-552
+###################################################
+plot(neat.x, neat.xpmat[, c(3, 4, 7:10)])
+
+
+###################################################
+### code chunk number 30: equatevignette.Rnw:561-562
+###################################################
+plot(neat.y, neat.ypmat[, c(3, 4, 7:10)])
+
+
+###################################################
+### code chunk number 31: equatevignette.Rnw:570-575
+###################################################
+set.seed(131031)
+reps <- 100
+xn <- 100
+yn <- 100
+crit <- equate(neat.xp, neat.yp, "e", "c")$conc$yx
+
+
+###################################################
+### code chunk number 32: equatevignette.Rnw:578-589
+###################################################
+neat.args <- list(i = list(type = "i"),
+	mt = list(type = "mean", method = "t"),
+	mc = list(type = "mean", method = "c"),
+	lt = list(type = "lin", method = "t"),
+	lc = list(type = "lin", method = "c"),
+	ef = list(type = "equip", method = "f", smooth = "log"),
+	ec = list(type = "equip", method = "c", smooth = "log"),
+	ct = list(type = "circ", method = "t"),
+	cc = list(type = "circ", method = "c", chainmidp = "lin"))
+bootout <- bootstrap(x = neat.xp, y = neat.yp, xn = xn, yn = yn,
+	reps = reps, crit = crit, args = neat.args)
+
+
+###################################################
+### code chunk number 33: equatevignette.Rnw:592-601
+###################################################
+plot(bootout, addident = F, col = c(1, rainbow(8)))
+plot(bootout, out = "se", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top")
+plot(bootout, out = "bias", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(-.9, 2.7)))
+plot(bootout, out = "rmse", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(0, 2.5)))
+
+
+###################################################
+### code chunk number 34: plotstudy1means
+###################################################
+plot(bootout, addident = F, col = c(1, rainbow(8)))
+
+
+###################################################
+### code chunk number 35: plotstudy1se
+###################################################
+plot(bootout, out = "se", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top")
+
+
+###################################################
+### code chunk number 36: plotstudy1bias
+###################################################
+plot(bootout, out = "bias", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(-.9, 3)))
+
+
+###################################################
+### code chunk number 37: plotstudy1rmse
+###################################################
+plot(bootout, out = "rmse", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(0, 3)))
+
+
+###################################################
+### code chunk number 38: equatevignette.Rnw:622-623
+###################################################
+plot(bootout, addident = F, col = c(1, rainbow(8)))
+
+
+###################################################
+### code chunk number 39: equatevignette.Rnw:632-633
+###################################################
+plot(bootout, out = "se", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top")
+
+
+###################################################
+### code chunk number 40: equatevignette.Rnw:642-643
+###################################################
+plot(bootout, out = "bias", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(-.9, 3)))
+
+
+###################################################
+### code chunk number 41: equatevignette.Rnw:652-653
+###################################################
+plot(bootout, out = "rmse", addident = F,
+	col = c(1, rainbow(8)), legendplace = "top",
+	morepars = list(ylim = c(0, 3)))
+
+
+###################################################
+### code chunk number 42: equatevignette.Rnw:661-662
+###################################################
+round(summary(bootout), 2)
 
 

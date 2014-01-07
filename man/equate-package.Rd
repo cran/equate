@@ -2,16 +2,15 @@
 \alias{equate-package}
 \docType{package}
 \title{
-Statistical Methods for Test Score Equating
+Observed-Score Linking and Equating
 }
 \description{
-The equate package contains functions for non-IRT equating under both equivalent and nonequivalent groups with anchor test designs. Mean, linear, equipercentile and circle-arc equating are supported, as are methods for univariate and bivariate presmoothing of score distributions. Specific equating methods currently supported include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating.
-}
+The equate package contains methods for observed-score linking and equating under the single-group, equivalent-groups, and nonequivalent-groups designs. Equating types include identity, mean, linear, general linear, equipercentile, circle-arc, and composites of these types. Equating methods include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating. Plotting and summary methods, and methods for univariate and bivariate presmoothing are also provided.}
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 1.2-0\cr
-Date: \tab 2013-9-20\cr
+Version: \tab 2.0-0\cr
+Date: \tab 2014-1-7\cr
 Depends: \tab R (>= 3.0.0)\cr
 License: \tab GPL (>= 2)\cr
 }
@@ -20,24 +19,22 @@ Index:
 \preformatted{
 ACTmath                 ACT Mathematics Test Scores
 KBneat                  Test Scores under a NEAT design
-PISAusa                 Programme for International Student Assessment 2009 USA Data
-descript                Descriptive Statistics for a Frequency Table
-equate                  Statistical Equating
-freqavg                 Frequency Adjusting and Averaging
-freqtab                 Frequency Tabulation
-loglinear               Loglinear Smoothing
-plot.freqtab            Plotting of Frequency Distributions
-plot.equate             Plotting of Equating Functions
-px                      Percentile Rank and Cumulative Distribution
-                        Functions
-se.boot                 Bootstrap Standard Errors of Equating
+PISA                    Programme for International Student Assessment 2009 USA Data
+descriptives            Descriptive Statistics for Frequency Tables
+equate                  Observed Score Linking and Equating
+composite               Composite Linking and Equating
+bootstrap               Bootstrap Equating Error
+freqtab                 Frequency Distribution Tables
+presmoothing            Frequency Distribution Presmoothing
+plot.freqtab            Plotting Frequency Distributions
+plot.equate             Plotting Equating Results
 }
 
 Further information is available in the following vignettes:
 \tabular{ll}{
 \code{equatevignette} \tab equate vignette (source, pdf)\cr
 }
-The package vignette provides an introduction to statistical equating and includes descriptions of the supported equating methods and examples. The help page for the main function of the package, \code{\link{equate}}, contains additional examples.
+The package vignette provides an introduction to linking and equating and includes descriptions of the supported equating methods and examples. The help page for the main function of the package, \code{\link{equate}}, contains additional examples.
 }
 \author{
 Anthony Albano <tony.d.albano@gmail.com>
