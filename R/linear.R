@@ -75,6 +75,9 @@ linear <- function(x, y, type = "linear", method = "none",
 		if(is.function(cy)) cy <- cy(x, y, ...)
 		if(is.function(sx)) sx <- sx(x, y, ...)
 		if(is.function(sy)) sy <- sy(x, y, ...)
+		# Put sigma on the scale of s
+		# sigmayr <- sigmay*sx/sigmax
+		# Then, sigmaxr <- sx
 		slope <- (way*sigmay + (1 - way)*sy)/
 			(wax*sigmax + (1 - wax)*sx)
 		intercept <- (wby*muy + (1 - wby)*cy) -

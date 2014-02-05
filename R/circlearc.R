@@ -99,6 +99,7 @@ circle <- function(x, yps, cent, r) {
 	else if(yps[2] > 0)
 		out <- cent[2] + sqrt((r^2) -
 			(x - cent[1])^2)
+	else out <- x
 	names(out) <- NULL
 	
 	return(out)

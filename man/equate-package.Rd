@@ -9,8 +9,8 @@ The equate package contains methods for observed-score linking and equating unde
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 2.0-0\cr
-Date: \tab 2014-1-7\cr
+Version: \tab 2.0-1\cr
+Date: \tab 2014-2-5\cr
 Depends: \tab R (>= 3.0.0)\cr
 License: \tab GPL (>= 2)\cr
 }

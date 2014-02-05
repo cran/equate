@@ -224,8 +224,10 @@ points.freqtab <- function(x, xcol = 1, pch = 16, ...) {
 	index <- as.logical(x[, 3])
 	xpoints <- x[index, 1]
 	vpoints <- x[index, 2]
-	dens <- pmax(0, pmin(255,
-		scale(x[index, 3])*50 + 100))
+	if(sd(x[index, 3]) > 0)
+		dens <- pmax(0, pmin(255,
+			scale(x[index, 3])*50 + 100))
+	else dens <- rep(150, sum(index))
 	rgbcol <- col2rgb(xcol)
 	ptcol <- rgb(rgbcol[1], rgbcol[2], rgbcol[3],
 		dens, maxColorValue = 255)

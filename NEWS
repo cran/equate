@@ -1,4 +1,26 @@
-equate_2.0-0 (2013-12-20)
+equate_2.0-1 (2014-2-5)
+
+  o points.freqtab fixed to handle plotting
+    frequencies that are all the same.
+
+  o Bug fixed in printing and summarizing
+    equipercentile output.
+    
+  o Circle-arc equating fixed to handle the
+    condition where the midpoints do not
+    differ from x to y.
+
+  o Score conversion with chained equipercentile
+    output now works. Previously, there was an 
+    error in how the smoothing method was
+    interpreted.
+
+  o Score conversion with equipercentile now
+    works when x only contains values with
+    percentile ranks of 0 or 1. Previously, this
+    produced an error.
+
+equate_2.0-0 (2014-1-7)
 
   o New "general linear" equating type.
     

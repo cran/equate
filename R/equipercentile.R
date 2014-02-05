@@ -81,7 +81,7 @@ equip <- function(x, y, ky = max(y[, 1])) {
 	if(any(round(diff(yscale), 8) != yinc))
 		stop("'y' scale must be equal-interval")
 	hinc <- yinc/2
-	yx <- vector()
+	yx <- numeric(length = length(prank))
 	fy <- fx(y)
 	sn <- nrow(y)
 	Ly <- min(yscale)
@@ -94,26 +94,28 @@ equip <- function(x, y, ky = max(y[, 1])) {
 	yx[xnone] <- Ly - hinc
 	yx[xone] <- ky + hinc
 	yx[xyone] <- xscale[xyone]
-	for(j in xbot:xtop) {
-		yu <- 1
-		while(fy[yu] <= prank[j])
-			yu <- yu + 1
-		yu2 <- ifelse(yu == 1, 0, fy[yu - 1])
-		g0 <- fy[yu] - yu2
-		yx[j] <- y[yu, 1] - hinc + ((prank[j] - yu2)/g0)*yinc
-		if(g0 > 0 & xn)
-			se[j] <- eqse(prank[j], g0, yu2, xn, yn)
-	}
-	if(any(y[, 2] == 0)) {
-		xbot <- xbot + sum(prank[!xnone] <= min(fy))
-		for(i in xbot:xtop) {
-			yl <- sn
-			while(fy[yl] >= prank[i])
-				yl <- yl - 1
-			yl2 <- fy[yl + 1]
-			yxtemp <- y[yl, 1] + hinc + ((prank[i] - fy[yl])/
-				(yl2 - fy[yl]))*yinc
-			yx[i] <- mean(c(yx[i], yxtemp))
+	if(any(yx == 0)) {
+		for(j in xbot:xtop) {
+			yu <- 1
+			while(fy[yu] <= prank[j])
+				yu <- yu + 1
+			yu2 <- ifelse(yu == 1, 0, fy[yu - 1])
+			g0 <- fy[yu] - yu2
+			yx[j] <- y[yu, 1] - hinc + ((prank[j] - yu2)/g0)*yinc
+			if(g0 > 0 & xn)
+				se[j] <- eqse(prank[j], g0, yu2, xn, yn)
+		}
+		if(any(y[, 2] == 0)) {
+			xbot <- xbot + sum(prank[!xnone] <= min(fy))
+			for(i in xbot:xtop) {
+				yl <- sn
+				while(fy[yl] >= prank[i])
+					yl <- yl - 1
+				yl2 <- fy[yl + 1]
+				yxtemp <- y[yl, 1] + hinc + ((prank[i] - fy[yl])/
+					(yl2 - fy[yl]))*yinc
+				yx[i] <- mean(c(yx[i], yxtemp))
+			}
 		}
 	}
 

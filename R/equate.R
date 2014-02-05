@@ -172,7 +172,7 @@ convert <- function(x, y, ...) {
 		
 	if(y$type == "equipercentile") {
 		if(y$method == "none") {
-			if(is.null(y$smoothmeth)) {
+			if(y$smoothmethod == "none") {
 				xtab <- y$x
 				ytab <- y$y
 			}
@@ -188,7 +188,7 @@ convert <- function(x, y, ...) {
 			p <- px(x, xtab)
 		}
 		else {
-			if(is.null(y$smoothmeth)) {
+			if(y$smoothmethod == "none") {
 				xtab <- mfreqtab(y$x)
 				xvtab <- mfreqtab(y$x, 2)
 				ytab <- mfreqtab(y$y)
@@ -242,7 +242,7 @@ summary.equate <- function(object, ...) {
 
 	xtab <- mfreqtab(object$x)
 	ytab <- mfreqtab(object$y)
-	if(!is.null(object$smoothmeth)) {
+	if(object$smoothmethod != "none") {
 		xtab <- data.frame(xtab,
 			smooth = mfreqtab(object$xsmooth)[, 2])
 		ytab <- data.frame(ytab,
@@ -252,7 +252,7 @@ summary.equate <- function(object, ...) {
 	if(object$design == "nonequivalent groups") {
 		xvtab <- mfreqtab(object$x, 2)
 		yvtab <- mfreqtab(object$y, 2)
-		if(!is.null(object$smoothmeth)) {
+		if(object$smoothmeth != "none") {
 			xvtab <- data.frame(xvtab,
 				smooth = mfreqtab(object$xsmooth, 2)[, 2])
 			yvtab <- data.frame(yvtab,
