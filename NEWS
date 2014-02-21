@@ -1,4 +1,13 @@
-equate_2.0-1 (2014-2-5)
+equate_2.0-2 (2014-2-21)
+
+  o Some minor cleanup.
+
+  o plot.bootstrap was fixed for objects
+    containing output for only one equating.
+
+  o print method was added for bootstrap objects.
+
+equate_2.0-1 (2014-2-1)
 
   o points.freqtab fixed to handle plotting
     frequencies that are all the same.
@@ -6,10 +15,6 @@ equate_2.0-1 (2014-2-5)
   o Bug fixed in printing and summarizing
     equipercentile output.
     
-  o Circle-arc equating fixed to handle the
-    condition where the midpoints do not
-    differ from x to y.
-
   o Score conversion with chained equipercentile
     output now works. Previously, there was an 
     error in how the smoothing method was

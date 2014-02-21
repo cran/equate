@@ -131,6 +131,21 @@ is.bootstrap <- function(x) {
 }
 
 #----------------------------------------------------------------
+# Print method
+
+print.bootstrap <- function(x, ...) {
+	
+	nf <- length(x$args)
+	cat("\nBootstrap Equating Error\n\n")
+	cat("Design:", if(ncol(x$y) < ncol(x$x)) "single group"
+			else if(ncol(x$x) == 2) "equivalent groups"
+			else "nonequivalent groups", "\n\n")
+	cat("Replications:", x$reps, "\n\n")
+	cat("Sample Sizes: x =", paste(x$xn, "; y =", sep = ""),
+		x$yn, "\n\n")
+}
+
+#----------------------------------------------------------------
 # Summary method
 
 summary.bootstrap <- function(object, ...) {
@@ -171,7 +186,7 @@ plot.bootstrap <- function(x, add = FALSE, out = "mean",
 		c("se", "bias", "mean", "rmse"))
 	if(!out %in% names(x))
 		stop(paste("'x' does not contain", out))
-	y <- cbind(x[[out]])[, subset]
+	y <- cbind(cbind(x[[out]])[, subset])
 	y <- apply(y, 2, function(z) z*rescale[2] + rescale[1])
 	
 	if(missing(ylab))

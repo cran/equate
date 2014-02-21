@@ -11,50 +11,34 @@ export(circ,
 	equate.list,
 	as.equate.list,
 	is.equate.list,
-	"[.equate.list",
 	equate.freqtab,
 	equate.default,
 	convert,
 	as.equate,
 	is.equate,
-	summary.equate,
-	summary.equate.list,
-	print.summary.equate,
-	plot.equate,
-	plot.equate.list,
-	print.equate,
 	composite,
 	composite.equate.list,
 	composite.list,
 	composite.default,
 	as.composite,
 	is.composite,
-	print.composite,
 	bootstrap,
 	bootstrap.equate,
 	bootstrap.freqtab,
 	as.bootstrap,
 	is.bootstrap,
-	summary.bootstrap,
-	plot.bootstrap,
 	lnse,
 	eqse,
 	freqtab,
 	as.freqtab,
 	is.freqtab,
 	mfreqtab,
-	plot.freqtab,
 	ufreqplot,
 	bfreqplot,
-	points.freqtab,
-	summary.freqtab,
 	descript,
-	mean.freqtab,
 	sd.freqtab,
 	cov.freqtab,
 	cor.freqtab,
-	min.freqtab,
-	max.freqtab,
 	skew.freqtab,
 	kurt.freqtab,
 	fx,
@@ -65,3 +49,20 @@ export(circ,
 	freqavg,
 	synthetic,
 	syntheticequip)
+S3method("summary", "equate")
+S3method("plot", "equate")
+S3method("print", "equate")
+S3method("summary", "equate.list")
+S3method("plot", "equate.list")
+S3method("[", "equate.list")
+S3method("print", "summary.equate")
+S3method("print", "composite")
+S3method("print", "bootstrap")
+S3method("summary", "bootstrap")
+S3method("plot", "bootstrap")
+S3method("plot", "freqtab")
+S3method("points", "freqtab")
+S3method("summary", "freqtab")
+S3method("mean", "freqtab")
+S3method("min", "freqtab")
+S3method("max", "freqtab")

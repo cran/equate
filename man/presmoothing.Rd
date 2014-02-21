@@ -119,10 +119,12 @@ xt.fun <- cbind(xscale, xscale^2, xscale^3)
 xt.fun <- cbind(xt.fun, teeth2, xt.fun * teeth2)
 xlog3 <- loglinear(xttab, xt.fun)
 
+op <- par(no.readonly = TRUE)
 par(mfrow = c(3, 1))
 plot(xttab, main = "unsmoothed", ylim = c(0, 30))
 plot(xlog2, main = "ignoring teeth", ylim = c(0, 30))
 plot(xlog3, main = "preserving teeth", ylim = c(0, 30))
+par(op)
 
 # bivariate example, preserving first 3 moments of total
 # and v (anchor) each of x and y, and the covariance
