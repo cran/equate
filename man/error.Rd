@@ -17,9 +17,11 @@ These functions return bootstrap standard errors, bias, and RMSE of equating.
 
 \method{bootstrap}{equate}(x, xp = x$x, yp = x$y, ...)
 
-\method{bootstrap}{freqtab}(x, y, xn = sum(x[, ncol(x)]),
-	yn = sum(y[, ncol(y)]), reps = 100, crit, args,
+\method{bootstrap}{freqtab}(x, y, xn = sum(x),
+	yn = sum(y), reps = 100, crit, args,
 	eqs = FALSE, ...)
+	
+\method{summary}{bootstrap}(object, weights, subset, ...)
 }
 \arguments{
   \item{x}{
@@ -46,6 +48,15 @@ named list of equating arguments, passed to \code{\link{equate}}, specifying, e.
   \item{eqs}{
 logical, with default \code{FALSE}, indicating whether or not the matrices of equating functions (one column per replication, per equating) should be returned.
 }
+  \item{object}{
+\code{bootstrap} output to be summarized.
+}
+  \item{weights}{
+vector of weights to be used in calculating weighted average errors with \code{summary}, defaulting to the frequencies in \code{margin(object$x)}.
+}
+  \item{subset}{
+vector indicating a subset of the score scale for which errors should be summarized.
+}
   \item{\dots}{
 further arguments passed to or from other methods.
 }
@@ -53,7 +64,7 @@ further arguments passed to or from other methods.
 \details{
 Samples are drawn of size \code{xn} and \code{yn}, with replacement, from each score distribution. Form Y equivalents of each form X score are then obtained using either the arguments in the equating output or those provided. This process is repeated \code{reps} times. Standard errors are calculated as standard deviations over replications for each score point; bias is the mean equated score over replications, minus the criterion; and RMSE is the square root of the squared standard error and squared bias combined.
 
-The method for equating objects is designed to be called from within \code{\link{equate}}. It simply extracts the necessary arguments from the equating output before bootstrapping.
+The bootstrap method for objects of class \dQuote{\code{equate}} is designed to be called from within \code{\link{equate}}. It simply extracts the necessary arguments from the equating output before bootstrapping.
 
 When each element in \code{args} is a named list of equating arguments, multiple equatings are performed at each replication in the bootstrapping.
 
@@ -65,23 +76,28 @@ A list is returned, containing arguments supplied for \code{x}, \code{y}, \code{
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
+\seealso{
+\code{\link{plot.bootstrap}}
+}
 \examples{
 # Parametric bootstrapping using smoothed
 # frequency distributions
 set.seed(111213)
-x <- freqtab(KBneat$x[, 1], KBneat$x[, 2], xscale = 0:36, vscale = 0:12)
-y <- freqtab(KBneat$y[, 1], KBneat$y[, 2], xscale = 0:36, vscale = 0:12)
+x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
+y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
 xp <- loglinear(x, asfreqtab = TRUE)
 yp <- loglinear(y, asfreqtab = TRUE)
 crit <- equate(xp, yp, "e", "c")$conc$yx
 eqargs <- list(m.t = list(type = "m", method = "t"),
   l.t = list(type = "l", method = "t"))
 bootout1 <- bootstrap(x = x, y = y, xn = 100, yn = 100,
-  crit = crit, args = eqargs)
-plot(bootout1, out = "rmse", legendplace = "top", addident = FALSE)
+  crit = crit, args = eqargs, reps = 30)
+plot(bootout1, out = "rmse", legendplace = "top",
+  addident = FALSE)
 
 # Bootstraps for an existing equating
 eq <- equate(x, y, type = "m", method = "t")
-bootout2 <- bootstrap(eq, xn = 100, yn = 100, crit = crit)
+bootout2 <- bootstrap(eq, xn = 100, yn = 100,
+  crit = crit, reps = 30)
 }
 \keyword{methods}

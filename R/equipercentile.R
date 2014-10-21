@@ -6,17 +6,18 @@
 
 equipercentile <- function(x, y, method = "none",
 	ws = -1, smoothmethod = c("none", "bump",
-	"average", "loglinear"), lowp = c(min(x[, 1]),
-	min(y[, 1])), highp = c(max(x[, 1]), max(y[, 1])),
+	"average", "loglinear"), lowp = c(min(scales(x)),
+	min(scales(y))), highp = c(max(scales(x)), max(scales(y))),
 	verbose = FALSE, ...) {
 
 	smoothmethod <- match.arg(smoothmethod)
 	if(missing(y))
-		y <- mfreqtab(x, 2)
-	if(ncol(y) < ncol(x)) {
+		y <- margin(x, 2)
+	if(margins(y) < margins(x)) {
 		xtab <- presmoothing(x, smoothmethod, ...)
-		ytab <- mfreqtab(xtab, 2)
-		xtab <- mfreqtab(xtab)
+		ytab <- margin(xtab, 2)
+		xtab <- margin(xtab)
+		x <- margin(x)
 	}
 	else {
 		xtab <- presmoothing(x, smoothmethod, ...)
@@ -27,25 +28,26 @@ equipercentile <- function(x, y, method = "none",
 		yxs <- equip(xtab, ytab, highp[2])
 	else if(method == "frequency estimation") {
 		stabs <- synthetic(xtab, ytab, ws, method)
-		yxs <- equip(mfreqtab(stabs$xsynthetic),
-			mfreqtab(stabs$ysynthetic), highp[2])
+		yxs <- equip(margin(stabs$xsynthetic),
+			margin(stabs$ysynthetic), highp[2])
 	}
 	else if(method == "chained") {
-		vx <- equip(mfreqtab(xtab),
-			mfreqtab(xtab, 2))$yx
-		pvyx <- px(vx, mfreqtab(ytab, 2))
-		yxs <- equip(pvyx, mfreqtab(ytab))
+		vx <- equip(margin(xtab),
+			margin(xtab, 2))$yx
+		pvyx <- px(vx, margin(ytab, 2))
+		yxs <- equip(pvyx, margin(ytab))
 	}
 	yx <- yxs$yx
 	
 	if(!verbose)
 		out <- yx
 	else {
-		out <- c(list(x = x, y = y, concordance = data.frame(scale =
-			unique(x[, 1]), yx = yx), points = data.frame(low = lowp,
-			high = highp, row.names = c("x", "y")), smoothmethod =
-			smoothmethod), list(...)[names(list(...)) %in% c("jmin",
-			"degree", "xdegree", "scorefun")])
+		out <- c(list(x = x, y = y, concordance =
+				data.frame(scale = scales(x), yx = yx),
+			points = data.frame(low = lowp, high = highp,
+				row.names = c("x", "y")),
+			smoothmethod = smoothmethod), list(...)[names(list(...))
+				%in% c("jmin", "degree", "xdegree", "scorefun")])
 		if(method == "frequency estimation")
 			out <- c(out, stabs)
 		if(smoothmethod != "none") {
@@ -62,66 +64,62 @@ equipercentile <- function(x, y, method = "none",
 # Does it work for shrunken or stretched scales? Yes, now.
 # Previously, it is assumed that scores were in 1 point increments
 
-equip <- function(x, y, ky = max(y[, 1])) {
+equip <- function(x, y, ky = max(scales(y))) {
 
-	yscale <- unique(y[, 1])
-	yn <- sum(y[, 2])
+	yscale <- scales(y)
+	yn <- sum(y)
 	if(!is.freqtab(x)) {
 		prank <- sort(unique(x))
 		xscale <- yscale
 		xn <- 0
 	}
 	else {
-		prank <- px(x)
-		xscale <- unique(x[, 1])
-		xn <- sum(x[, 2])
-		se <- vector(length = length(prank))
+		prank <- round(px(x), 10)
+		xscale <- scales(x)
+		xn <- sum(x)
+		#se <- vector(length = length(prank))
 	}
 	yinc <- round(diff(yscale)[1], 8)
 	if(any(round(diff(yscale), 8) != yinc))
 		stop("'y' scale must be equal-interval")
 	hinc <- yinc/2
 	yx <- numeric(length = length(prank))
-	fy <- fx(y)
-	sn <- nrow(y)
+	fy <- round(fx(y), 10)
+	sn <- length(yscale)
 	Ly <- min(yscale)
 	xnone <- prank == 0
 	xone <- prank == 1
 	xbot <- sum(xnone) + 1
 	xtop <- sum(!xone)
+	yxi <- xbot:xtop
 	xyone <- which(xscale[xone] > (ky + hinc)) + xtop
 
 	yx[xnone] <- Ly - hinc
 	yx[xone] <- ky + hinc
 	yx[xyone] <- xscale[xyone]
 	if(any(yx == 0)) {
-		for(j in xbot:xtop) {
-			yu <- 1
-			while(fy[yu] <= prank[j])
-				yu <- yu + 1
-			yu2 <- ifelse(yu == 1, 0, fy[yu - 1])
-			g0 <- fy[yu] - yu2
-			yx[j] <- y[yu, 1] - hinc + ((prank[j] - yu2)/g0)*yinc
-			if(g0 > 0 & xn)
-				se[j] <- eqse(prank[j], g0, yu2, xn, yn)
-		}
-		if(any(y[, 2] == 0)) {
-			xbot <- xbot + sum(prank[!xnone] <= min(fy))
-			for(i in xbot:xtop) {
-				yl <- sn
-				while(fy[yl] >= prank[i])
-					yl <- yl - 1
-				yl2 <- fy[yl + 1]
-				yxtemp <- y[yl, 1] + hinc + ((prank[i] - fy[yl])/
-					(yl2 - fy[yl]))*yinc
-				yx[i] <- mean(c(yx[i], yxtemp))
-			}
+		yu <- sapply(yxi, function(i)
+			sum(fy <= prank[i]) + 1)
+		yu2 <- yu - 1
+		yu2[yu2 > 0] <- fy[yu2]
+		g0 <- fy[yu] - yu2
+		yx[yxi] <- yscale[yu] - hinc +
+			((prank[yxi] - yu2)/g0)*yinc
+		# standard errors
+		if(any(y == 0)) {
+			yxi <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
+			yl <- sapply(yxi, function(i)
+				sum(fy < prank[i]))
+			yl2 <- fy[yl + 1]
+			yxtemp <- yscale[yl] + hinc + ((prank[yxi] - fy[yl])/
+				(yl2 - fy[yl]))*yinc
+			yx[yxi] <- (yx[yxi] + yxtemp)/2
 		}
 	}
 
 	if(xn) {
 		out <- list(yx = yx)
-		out$se <- se
+		#out$se <- se
 	}
 	else
 		out <- list(yx = yx[match(x, prank)])

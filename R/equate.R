@@ -87,15 +87,15 @@ equate.freqtab <- function(x, y, type = c("identity",
 	verbose = TRUE, ...) {
 	
 	if(missing(y)) 
-        y <- mfreqtab(x, 2)
+        y <- margin(x, 2)
 	if(missing(lowp))
-		lowp <- c(min(x[, 1]), min(y[, 1]))
+		lowp <- c(min(scales(x)), min(scales(y)))
 	else if(pmatch(lowp[1], "obs", 0))
 		lowp <- c(min(x), min(y))
 	else if(length(lowp) == 1)
 		lowp[2] <- lowp[1]
 	if(missing(highp))
-		highp <- c(max(x[, 1]), max(y[, 1]))
+		highp <- c(max(scales(x)), max(scales(y)))
 	else if(pmatch(highp[1], "obs", 0))
 		highp <- c(max(x), max(y))
 	else if(length(highp) == 1)
@@ -119,15 +119,15 @@ equate.freqtab <- function(x, y, type = c("identity",
 				paste(method, type))
 			xname <- ifelse(exists(deparse(substitute(x)), 1,
 				inherits = FALSE), deparse(substitute(x)), "x")
-			if(ncol(y) == ncol(x))
+			if(margins(y) == margins(x))
 				yname <- ifelse(exists(deparse(substitute(y)), 1,
 					inherits = FALSE), deparse(substitute(y)), "y")
 			else yname <- xname
 			name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
 				perl = TRUE), "Equating:", xname, "to", yname)
 		}
-		design <- if(ncol(y) < ncol(x)) "single group"
-			else if(ncol(x) == 2) "equivalent groups"
+		design <- if(margins(y) < margins(x)) "single group"
+			else if(margins(x) == 1) "equivalent groups"
 			else "nonequivalent groups"
 		out <- c(list(name = name, type = type,
 			method = method, design = design), eqout)
@@ -183,22 +183,22 @@ convert <- function(x, y, ...) {
 			p <- px(x, xtab)
 		}
 		else if(y$method == "frequency estimation") {
-			xtab <- mfreqtab(y$xsynthetic)
-			ytab <- mfreqtab(y$ysynthetic)
+			xtab <- margin(y$xsynthetic)
+			ytab <- margin(y$ysynthetic)
 			p <- px(x, xtab)
 		}
 		else {
 			if(y$smoothmethod == "none") {
-				xtab <- mfreqtab(y$x)
-				xvtab <- mfreqtab(y$x, 2)
-				ytab <- mfreqtab(y$y)
-				yvtab <- mfreqtab(y$y, 2)
+				xtab <- margin(y$x)
+				xvtab <- margin(y$x, 2)
+				ytab <- margin(y$y)
+				yvtab <- margin(y$y, 2)
 			}
 			else {
-				xtab <- mfreqtab(y$xsmooth)
-				xvtab <- mfreqtab(y$xsmooth, 2)
-				ytab <- mfreqtab(y$ysmooth)
-				yvtab <- mfreqtab(y$ysmooth, 2)
+				xtab <- margin(y$xsmooth)
+				xvtab <- margin(y$xsmooth, 2)
+				ytab <- margin(y$ysmooth)
+				yvtab <- margin(y$ysmooth, 2)
 			}
 			vx <- equip(px(x, xtab), xvtab)$yx
 			p <- px(vx, yvtab)
@@ -240,38 +240,38 @@ is.equate <- function(x) {
 
 summary.equate <- function(object, ...) {
 
-	xtab <- mfreqtab(object$x)
-	ytab <- mfreqtab(object$y)
+	xtab <- as.data.frame(margin(object$x))
+	ytab <- as.data.frame(margin(object$y))
 	if(object$smoothmethod != "none") {
 		xtab <- data.frame(xtab,
-			smooth = mfreqtab(object$xsmooth)[, 2])
+			smooth = c(margin(object$xsmooth)))
 		ytab <- data.frame(ytab,
-			smooth = mfreqtab(object$ysmooth)[, 2])
+			smooth = c(margin(object$ysmooth)))
 	}
 	xvtab <- yvtab <- NULL
 	if(object$design == "nonequivalent groups") {
-		xvtab <- mfreqtab(object$x, 2)
-		yvtab <- mfreqtab(object$y, 2)
+		xvtab <- as.data.frame(margin(object$x, 2))
+		yvtab <- as.data.frame(margin(object$y, 2))
 		if(object$smoothmeth != "none") {
 			xvtab <- data.frame(xvtab,
-				smooth = mfreqtab(object$xsmooth, 2)[, 2])
+				smooth = c(margin(object$xsmooth, 2)))
 			yvtab <- data.frame(yvtab,
-				smooth = mfreqtab(object$ysmooth, 2)[, 2])
+				smooth = c(margin(object$ysmooth, 2)))
 		}
 		if(object$type != "composite" && (object$method ==
 			"frequency estimation" | object$method ==
 			"braun/holland")) {
 			xtab <- data.frame(xtab,
-				synthetic = mfreqtab(object$xsynthetic)[, 2])
+				synthetic = c(margin(object$xsynthetic)))
 			ytab <- data.frame(ytab,
-				synthetic = mfreqtab(object$ysynthetic)[, 2])
+				synthetic = c(margin(object$ysynthetic)))
 			xvtab <- data.frame(xvtab,
-				synthetic = mfreqtab(object$xsynthetic, 2)[, 2])
+				synthetic = c(margin(object$xsynthetic, 2)))
 			yvtab <- data.frame(yvtab,
-				synthetic = mfreqtab(object$ysynthetic, 2)[, 2])
+				synthetic = c(margin(object$ysynthetic, 2)))
 		}
 	}
-	yxtab <- as.freqtab(cbind(object$concordance[, 2], xtab[, 2]))
+	yxtab <- as.freqtab(cbind(object$concordance[, 2], xtab$count))
 	yxstats <- summary(yxtab)
 	rownames(yxstats) <- "observed"
 	
@@ -390,7 +390,7 @@ plot.equate <- function(..., elist = NULL, add = FALSE,
 	if(missing(subset)) subset <- 1:length(x)
 	x <- x[subset]
 	nx <- length(x)
-	xscale <- unique(x[[1]]$x[, 1])
+	xscale <- scales(x[[1]]$x)
 
 	out <- match.arg(tolower(out),
 		c("se", "bias", "eqs", "rmse"))
@@ -522,11 +522,11 @@ print.equate <- function(x, ...) {
 	if(!is.null(x$ws))
 		cat("Synthetic Weighting for x:",
 			x$ws, "\n\n")
-
-	stats <- rbind(x = summary(mfreqtab(x$x)),
-		y = summary(mfreqtab(x$y)),
+	xm <- margin(x$x)
+	stats <- rbind(x = summary(xm),
+		y = summary(margin(x$y)),
 		yx = summary(as.freqtab(cbind(x$concordance[, 2],
-			mfreqtab(x$x)[, 2]))))
+			c(xm)))))
 	cat("Summary Statistics:\n")
 		print(round(stats, 2))
 		cat("\n")

@@ -8,7 +8,7 @@ This function plots bootstrap equating results for objects of class \dQuote{\cod
 \method{plot}{bootstrap}(x, add = FALSE, out = "mean", xpoints,
   ypoints, addident = TRUE, identy, identcol = 1,
   rescale = c(0, 1), xlab = "Total Score", ylab,
-  col = rainbow(length(x)), pch, lty = 1, subset,
+  col = rainbow(length(x$args)), pch, lty = 1, subset,
   morepars = NULL, addlegend = TRUE, legendtext,
   legendplace = "bottomright", ...)
 }
@@ -70,16 +70,13 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \examples{
 set.seed(122713)
-neat.x <- freqtab(KBneat$x[, 1], KBneat$x[, 2],
-	xscale = 0:36, vscale = 0:12)
-neat.y <- freqtab(KBneat$y[, 1], KBneat$y[, 2],
-	xscale = 0:36, vscale = 0:12)
+neat.x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
+neat.y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
 eqargs <- list(m.t = list(type = "mean", method = "t"),
 	l.t = list(type = "lin", method = "t"),
-	e.f = list(type = "equip", method = "f", smooth = "log"),
 	c.t = list(type = "circ", method = "t"))
 bootout <- bootstrap(x = neat.x, y = neat.y, args = eqargs,
-	reps = 50)
+	reps = 20)
 plot(bootout, out = "se", legendplace = "top")
 }
 \keyword{misc}

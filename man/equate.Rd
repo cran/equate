@@ -23,7 +23,7 @@
 \alias{circ}
 \alias{radius}
 \alias{lin}
-\alias{syntheticequip}
+\alias{pse}
 \title{Observed Score Linking and Equating}
 \description{
 This function links the scale of \code{x} to the scale of \code{y} for the single-group, equivalent-groups, and nonequivalent-groups with anchor test designs.
@@ -41,7 +41,7 @@ This function links the scale of \code{x} to the scale of \code{y} for the singl
 }
 \arguments{
   \item{x, y}{
-for the default method, \code{x} must be a vector of scores and \code{y} an object of class \dQuote{\code{\link{equate}}}, the output of a previous equating. The standard usage is to provide \code{x} as a frequency table of class \dQuote{\code{\link{freqtab}}}, where \code{y} is also a frequeny table, and \code{x} is equated to \code{y}; if \code{y} is missing, a single-group design is assumed. Finally, \code{x} may be a list of two or more frequency tables, in which case the required arguments for one or more equatings are listed in \code{args}. See below for details.
+for the default method, \code{x} must be a vector of scores and \code{y} an object of class \dQuote{\code{equate}}, the output of a previous equating. The standard usage is to provide \code{x} as a frequency table of class \dQuote{\code{freqtab}}, where \code{y} is also a frequeny table, and \code{x} is equated to \code{y}; if \code{y} is missing, a single-group design is assumed. Finally, \code{x} may be a list of two or more frequency tables, in which case the required arguments for one or more equatings are listed in \code{args}. See below for details.
 }
   \item{type}{
 the type of equating. See below for details.
@@ -69,7 +69,7 @@ further arguments passed to or from other functions, including arguments specifi
 }
 }
 \details{
-Equating is typically performed on two frequency tables, \code{x} and \code{y}. In this case, the scores from both are used to define the equating function that links the scale of \code{x} to \code{y}. The equivalent-groups design is assumed when \code{x} and \code{y} are separate, univariate frequency tables. The nonequivalent-groups design is assumed when a \code{method} is specified, and \code{x} and \code{y} are separate bivariate frequency tables. Finally, a single-group design is assumed when \code{x} is a bivariate frequency table (containing scores on X and Y) and \code{y} is missing.
+Equating is typically performed on two frequency tables, \code{x} and \code{y}. In this case, the scores from both are used to define the equating function that links the scale of \code{x} to \code{y}. The equivalent-groups design is assumed when \code{x} and \code{y} are separate, univariate frequency tables. The nonequivalent-groups design is assumed when a \code{method} is specified, and \code{x} and \code{y} are separate multivariate frequency tables. Finally, a single-group design is assumed when \code{x} is a bivariate frequency table (containing scores on X and Y) and \code{y} is missing.
 
 The single-group design currently only differs from the equivalent groups design in that presmoothing can be used to preserve bivariate moments for \code{x} and \code{y} in the single-group design, whereas in the equivalent-groups design, with \code{x} and \code{y} specified separately, presmoothing is performed separately. If presmoothing is not performed via \code{equate}, the single-group and equivalent-groups designs produce the same result.
 
@@ -170,15 +170,14 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 # Random groups equating for (1) identity, (2) mean, 
 # (3) linear, (4) equipercentile with loglinear
 # smoothing, and (5) a composite of mean and identity
-rscale <- ACTmath[, 1]
-rx <- as.freqtab(cbind(rscale, ACTmath[, 2]))
-ry <- as.freqtab(cbind(rscale, ACTmath[, 3]))
+rx <- as.freqtab(ACTmath[, 1:2])
+ry <- as.freqtab(ACTmath[, c(1, 3)])
 set.seed(2007)
 
-req1 <- equate(rx, ry, type = "i", boot = TRUE, reps = 50)
-req2 <- equate(rx, ry, type = "m", boot = TRUE, reps = 50)
-req3 <- equate(rx, ry, type = "l", boot = TRUE, reps = 50)
-req4 <- equate(rx, ry, type = "e", boot = TRUE, reps = 50,
+req1 <- equate(rx, ry, type = "i", boot = TRUE, reps = 5)
+req2 <- equate(rx, ry, type = "m", boot = TRUE, reps = 5)
+req3 <- equate(rx, ry, type = "l", boot = TRUE, reps = 5)
+req4 <- equate(rx, ry, type = "e", boot = TRUE, reps = 5,
   smooth = "loglin", degree = 3)
 req5 <- composite(list(req1, req2), wc = .5, symmetric = TRUE)
 
@@ -192,10 +191,8 @@ plot(req1, req2, req3, req4, addident = FALSE, out = "se",
 
 # Nonequivalent groups design for (1) Tucker linear,
 # (2) frequency estimation , and (3) Braun/Holland linear
-nx <- freqtab(KBneat$x[, 1], xscale = 0:36,
-	v = KBneat$x[, 2], vscale = 0:12)
-ny <- freqtab(KBneat$y[, 1], xscale = 0:36,
-	v = KBneat$y[, 2], vscale = 0:12)
+nx <- freqtab(KBneat$x, scales = list(0:36, 0 :12))
+ny <- freqtab(KBneat$y, scales = list(0:36, 0 :12))
 
 neq1 <- equate(nx, ny, type = "linear", method = "tuck", ws = 1)
 neq2 <- equate(nx, ny, type = "equip", method = "freq", ws = 1)
@@ -207,10 +204,10 @@ round(cbind(xscale = 0:36, tucker = neq1$conc$yx,
 
 # Multiple linkings using PISA reading booklet 6
 # clusters 3a, 5, 6, and 7
-r3 <- freqtab(PISA$totals$b6$r3a, xscale = 0:15)
-r5 <- freqtab(PISA$totals$b6$r5, xscale = 0:15)
-r6 <- freqtab(PISA$totals$b6$r6, xscale = 0:15)
-r7 <- freqtab(PISA$totals$b6$r7, xscale = 0:14)
+r3 <- freqtab(PISA$totals$b6$r3a, scales = 0:15)
+r5 <- freqtab(PISA$totals$b6$r5, scales = 0:15)
+r6 <- freqtab(PISA$totals$b6$r6, scales = 0:15)
+r7 <- freqtab(PISA$totals$b6$r7, scales = 0:14)
 eqargs <- list(r3r5 = list(type = "linear", x = "r3", y = "r5",
     name = "Linear Linking PISA r3 to r5"),
   r5r6 = list(type = "linear", x = "r5", y = "r6",
@@ -220,6 +217,21 @@ eqargs <- list(r3r5 = list(type = "linear", x = "r3", y = "r5",
 req <- equate(list(r3 = r3, r5 = r5, r6 = r6, r7 = r7), eqargs)
 
 # Put PISA r3 on the scale of r7 using the linking chain
+# Compare to a direct linking of r3 to r7
 equate(equate(req$r3r5$conc$yx, req$r5r6), req$r6r7)
+equate(r3, r7, "linear")$conc$yx
+
+# Linking PISA cluster r3a to r5 with multiple anchors
+m367 <- freqtab(PISA$totals$b6[1:198, c("r3a", "r6", "r7")],
+	scales = list(0:15, 0:16, 0:14))
+m567 <- freqtab(PISA$totals$b6[199:396, c("r5", "r6", "r7")],
+	scales = list(0:15, 0:16, 0:14))
+meq1 <- equate(m367, m567, type = "mean", method = "nom")
+meq2 <- equate(m367, m567, type = "mean", method = "tuck")
+meq3 <- equate(m367, m567, type = "lin", method = "tuck")
+meq4 <- equate(m367, m567, type = "equip", method = "freq",
+	smooth = "log", show = FALSE)
+meq <- equate(m367, m567, type = "mean", method = "nom")
+plot(meq1, meq2, meq3, meq4, meq, req[[1]])
 }
 \keyword{methods}

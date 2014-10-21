@@ -7,26 +7,25 @@
 # get passed through ... to the linear function
 
 circlearc <- function(x, y, type, method,
-	lowp = c(min(x[, 1]), min(y[, 1])),	midp = c(mean(x), NA),
-	highp = c(max(x[, 1]), max(y[, 1])), chainmidp = "mean",
+	lowp = c(min(scales(x)), min(scales(y))),
+	midp = c(mean(x), NA), highp = c(max(scales(x)),
+	max(scales(y))), chainmidp = "mean",
 	simple = TRUE, verbose = FALSE, ...) {
 
 	if(missing(y))
-		y <- mfreqtab(x, 2)
-	if(ncol(y) < ncol(x))
-		x <- mfreqtab(x)
+		y <- margin(x, 2)
+	if(margins(y) < margins(x))
+		x <- margin(x)
 
-	xscale <- unique(x[, 1])
-	yscale <- unique(y[, 1])
-	
+	xscale <- scales(x)
 	if(is.na(midp[2])) {
 		if(method == "none")
 			midp[2] <- mean(y)
 		else if(method == "chained") {
 			slope2 <- ifelse(chainmidp == "mean", 1,
-				sd.freqtab(y[, -2])/sd.freqtab(y[, -1]))
-			midp[2] <- mean(y) + slope2*(mean.freqtab(x[, -1]) -
-				mean.freqtab(y[, -1]))
+				sd.freqtab(y)/sd.freqtab(y, 2))
+			midp[2] <- mean(y) + slope2*(mean(x, 2) -
+				mean(y, 2))
 		}
 		else
 			midp <- linear(x, y, type = "mean", method = method,
@@ -82,7 +81,7 @@ circ <- function(x, xp, yp, yps, intercept, slope,
 	index <- x >= xp[1] & x <= xp[3]
 	out <- slope*x + intercept
 	out[index] <- circle(x[index], yps, cent, r) +
-		if(simple) out[index] else 0
+		if(simple & yps[2]) out[index] else 0
 	names(out) <- NULL
 
 	return(out)

@@ -43,8 +43,8 @@ bootstrap.equate <- function(x, xp = x$x, yp = x$y, ...) {
 #----------------------------------------------------------------
 # Method for freqtab class
 
-bootstrap.freqtab <- function(x, y, xn = sum(x[, ncol(x)]),
-	yn = sum(y[, ncol(y)]), reps = 100, crit, args,
+bootstrap.freqtab <- function(x, y, xn = sum(x),
+	yn = sum(y), reps = 100, crit, args,
 	eqs = FALSE, ...) {
 	
 	dots <- list(...)[names(list(...) != "")]
@@ -60,42 +60,47 @@ bootstrap.freqtab <- function(x, y, xn = sum(x[, ncol(x)]),
 			args[[i]]["verbose"] <- FALSE
 		}
 	}
-	nc <- ncol(x)
-	xscale <- unique(x[, 1])
-	yscale <- unique(y[, 1])
-	xprob <- x[, nc]/sum(x[, nc])
-	yprob <- y[, nc]/sum(y[, nc])
-	eqmats <- lapply(rep(NA, neq), matrix, nrow = length(xscale),
-		ncol = reps)
-	if(nc == 3) {
-		xindex <- 1:nrow(x)
-		yindex <- 1:nrow(y)
-		vscale <- unique(x[, 2])
+	if(missing(y)) {
+		yn <- xn
+		y <- NULL
+		xs <- scales(x, 1)
+		ys <- scales(x, 2)
+		xd <- as.data.frame(as.data.frame(x)[x > 0, 1:2])
+		xp <- x[x > 0]/sum(x)
+		xni <- nrow(xd)
+		eqmats <- lapply(rep(NA, neq), matrix,
+			nrow = length(xs), ncol = reps)
 		for(i in 1:reps) {
-			xi <- sample(xindex, xn, replace = TRUE, prob = xprob)
-			xtemp <- freqtab(x[xi, 1], x[xi, 2], xscale = xscale,
-				vscale = vscale)
-			yi <- sample(yindex, yn, replace = TRUE, prob = yprob)
-			ytemp <- freqtab(y[yi, 1], y[yi, 2], xscale = yscale,
-				vscale = vscale)
+			xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
+			xtemp <- freqtab(xd[xi, ], scales = list(xs, ys))
 			for(j in 1:neq)
-				eqmats[[j]][, i] <- do.call(equate.freqtab,
+				eqmats[[j]][, i] <- do.call("equate",
+					c(list(x = xtemp), args[[j]]))
+		}
+	}
+	else {
+		nx <- margins(x)
+		ny <- margins(y)
+		xs <- scales(x, 1:nx)
+		ys <- scales(y, 1:ny)
+		xd <- as.data.frame(as.data.frame(x)[x > 0, 1:nx])
+		yd <- as.data.frame(as.data.frame(y)[y > 0, 1:ny])
+		xp <- x[x > 0]/sum(x)
+		yp <- y[y > 0]/sum(y)
+		xni <- nrow(xd)
+		yni <- nrow(yd)
+		eqmats <- lapply(rep(NA, neq), matrix,
+			nrow = length(scales(x, 1)), ncol = reps)
+		for(i in 1:reps) {
+			xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
+			xtemp <- freqtab(xd[xi, ], scales = xs)
+			yi <- sample.int(yni, yn, replace = TRUE, prob = yp)
+			ytemp <- freqtab(yd[yi, ], scales = ys)
+			for(j in 1:neq)
+				eqmats[[j]][, i] <- do.call("equate",
 					c(list(x = xtemp, y = ytemp), args[[j]]))
 		}
 	}
-	else if(nc == 2) {
-		for(i in 1:reps) {
-			xtemp <- freqtab(sample(x[, 1], xn,
-				replace = TRUE, prob = xprob), xscale = xscale)
-			ytemp <- freqtab(sample(y[, 1], yn,
-				replace = TRUE, prob = yprob), xscale = yscale)
-			for(j in 1:neq)
-				eqmats[[j]][, i] <- do.call(equate.freqtab,
-					c(list(x = xtemp, y = ytemp), args[[j]]))
-		}
-	}
-	else stop("'x' and 'y' must be either univariate or bivariate")
-	
 	names(eqmats) <- names(args)
 	out <- list(x = x, y = y, reps = reps, xn = xn, yn = yn,
 		args = args, mean = sapply(eqmats, apply, 1, mean),
@@ -108,7 +113,7 @@ bootstrap.freqtab <- function(x, y, xn = sum(x[, ncol(x)]),
 		out[-(1:6)] <- lapply(out[-(1:6)], c)
 	if(eqs)
 		out$eqs <- if(neq == 1) eqmats[[1]] else eqmats
-	out <- as.bootstrap(out)	
+	out <- as.bootstrap(out)
 
 	return(out)
 }
@@ -137,8 +142,8 @@ print.bootstrap <- function(x, ...) {
 	
 	nf <- length(x$args)
 	cat("\nBootstrap Equating Error\n\n")
-	cat("Design:", if(ncol(x$y) < ncol(x$x)) "single group"
-			else if(ncol(x$x) == 2) "equivalent groups"
+	cat("Design:", if(is.null(x$y)) "single group"
+			else if(margins(x$x) == 1) "equivalent groups"
 			else "nonequivalent groups", "\n\n")
 	cat("Replications:", x$reps, "\n\n")
 	cat("Sample Sizes: x =", paste(x$xn, "; y =", sep = ""),
@@ -148,19 +153,27 @@ print.bootstrap <- function(x, ...) {
 #----------------------------------------------------------------
 # Summary method
 
-summary.bootstrap <- function(object, ...) {
+summary.bootstrap <- function(object, weights,
+	subset, ...) {
 
-	xtab <- mfreqtab(object$x)
-	xw <- xtab[, 2]/sum(xtab[, 2])
-	out <- data.frame(se = apply(cbind(object$se), 2, mean),
-		w.se = apply(cbind(object$se)*xw, 2, mean))
+	if(missing(subset))
+		subset <- 1:length(scales(object$x))
+	if(missing(weights))
+		weights <- c(margin(object$x))[subset]/
+			sum(margin(object$x)[subset])
+	out <- data.frame(se = apply(cbind(object$se)[subset, ],
+		2, mean), w.se = apply(cbind(object$se)[subset, ] *
+		weights, 2, mean))
 	if(!is.null(object$bias)) {
-		tempbias <- cbind(object$bias)
+		tempbias <- cbind(object$bias)[subset, ]
 		out$bias <- apply(tempbias, 2, mean)
 		out$a.bias <- apply(abs(tempbias), 2, mean)
-		out$w.bias <- apply(tempbias*xw, 2, mean)
-		out$wa.bias <- apply(abs(tempbias*xw), 2, mean)
-		out$rmse <- apply(cbind(object$rmse), 2, mean)
+		out$w.bias <- apply(tempbias * weights, 2, mean)
+		out$wa.bias <- apply(abs(tempbias * weights), 2, mean)
+		out$rmse <- apply(cbind(object$rmse)[subset, ],
+			2, mean)
+		out$w.rmse <- apply(cbind(object$rmse)[subset, ] *
+			weights, 2, mean)
 	}
 	class(out) <- c("summary.bootstrap", "data.frame")
 
@@ -173,14 +186,14 @@ summary.bootstrap <- function(object, ...) {
 plot.bootstrap <- function(x, add = FALSE, out = "mean",
 	xpoints, ypoints, addident = TRUE, identy,
 	identcol = 1, rescale = c(0, 1), xlab = "Total Score",
-	ylab, col = rainbow(length(x)), pch, lty = 1,
+	ylab, col = rainbow(length(x$args)), pch, lty = 1,
 	subset, morepars = NULL, addlegend = TRUE,
 	legendtext, legendplace = "bottomright", ...) {
 	
 	if(missing(subset)) subset <- 1:length(x$args)
 	x$args <- x$args[subset]
 	nx <- length(subset)
-	xscale <- unique(x$x[, 1])
+	xscale <- scales(x$x)
 
 	out <- match.arg(tolower(out),
 		c("se", "bias", "mean", "rmse"))
@@ -241,7 +254,7 @@ plot.bootstrap <- function(x, add = FALSE, out = "mean",
 			legendtext <- lapply(x$args, function(z)
 				legendtext[charmatch(substr(z$type, 1, 2),
 				legendtext)])
-			if(ncol(x$x) == 3) {
+			if(margins(x$x) == 2 & !is.null(x$y)) {
 				methods <- c("nW", "chain", "b/H", "tucker",
 					"levine", "fE")
 				methods <- lapply(x$args, function(z)

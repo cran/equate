@@ -12,14 +12,14 @@ This function plots univariate and bivariate frequency tables of class \dQuote{\
   ylty = 1, xlab = "Total Test", addlegend = !missing(y),
   legendtext, ...)
 
-\method{points}{freqtab}(x, xcol = 1, pch = 16, ...)
+\method{points}{freqtab}(x, xcol = 1, pch = 16, ds = 50, dm = 100, ...)
 }
 \arguments{
   \item{x}{
 univariate or bivariate score distribution of class \dQuote{\code{\link{freqtab}}}.
 }
   \item{y}{
-either an object of class \dQuote{\code{\link{freqtab}}}, where frequencies will be extracted, or a vector or matrix of frequencies, to be added to the plot of \code{x}. See below for details.
+either an object of class \dQuote{\code{freqtab}}, where frequencies will be extracted, or a vector or matrix of frequencies, to be added to the plot of \code{x}. See below for details.
 }
   \item{xcol, ycol}{
 colors used in plotting \code{x} and \code{y}.
@@ -38,6 +38,9 @@ logical indicating whether or not a legend should be added.
 }
   \item{legendtext}{
 character vector of text to be passed to the \code{legend} argument of the \code{legend} function, defaulting to column names used in \code{y}.
+}
+  \item{ds, dm}{
+integers for the scaling and center of the RGB density values, with defaults of 50 and 100. These are used to convert the observed counts in \code{x} to the [0, 255] range of RGB values.
 }
   \item{\dots}{
 further arguments passed to or from other methods, such as graphical parameters besides \code{col}, \code{type}, and \code{pch}.
@@ -62,11 +65,11 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{plot.table}}, \code{\link{plot.equate}}, \code{\link{lines}}, \code{\link{points}}
 }
 \examples{
-x <- freqtab(KBneat$x[, 1], KBneat$x[, 2],
-  xscale = 0:36, vscale = 0:12)
+x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
 plot(x)
 
-xs <- loglinear(x, degree = 4, xdegree = 1, stepup = TRUE)
-plot(x, xs[c(3:4, 7:9)], lwd = 2)
+xs <- loglinear(x, degrees = c(4, 1),
+  stepup = TRUE, showWarnings = FALSE)
+plot(x, xs, lwd = 2)
 }
 \keyword{misc}

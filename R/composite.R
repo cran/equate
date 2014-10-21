@@ -70,11 +70,8 @@ composite.list <- function(x, wc, name,	symmetric = FALSE,
 	if(!all(sapply(x, function(z) is.equate(z))))
 		stop("all elements of 'x' must be class 'equate'")
 	
-	x <- as.equate.list(x)
-	cl <- match.call()
-	cl[[1]] <- as.name("composite.equate.list")
-
-	eval(cl, parent.frame())
+	return(composite(as.equate.list(x), wc, name,
+		symmetric, p, verbose, ...))
 }
 
 #----------------------------------------------------------------
@@ -103,10 +100,10 @@ print.composite <- function(x, ...) {
 	cat(x$name, "\n\n")
 	cat("Design:", x$design, "\n\n")
 
-	stats <- rbind(x = summary(mfreqtab(x$x)),
-		y = summary(mfreqtab(x$y)),
+	stats <- rbind(x = summary(margin(x$x)),
+		y = summary(margin(x$y)),
 		yx = summary(as.freqtab(cbind(x$concordance[, 2],
-			mfreqtab(x$x)[, 2]))))
+			c(margin(x$x))))))
 	cat("Summary Statistics:\n")
 		print(round(stats, 2))
 		cat("\n")

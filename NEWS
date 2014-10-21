@@ -1,3 +1,44 @@
+equate_2.0-3 (2014-11-1)
+
+  o Functionality has been added for equating under
+    a multiple anchor test design. New methods
+    include nominal weights and Tucker multivariate
+    and multivariate frequency estimation for
+    Braun/Holland and equipercentile equating.
+    
+  o The freqtab class has been restructured, with a
+    new, more general approach to the construction
+    and manipulation of multivariate frequency
+    tables. A freqtab object is now a simple table
+    array rather than a data.frame.
+
+  o formula method added for loglinear
+    presmoothing via the presmoothing function.
+  
+  o Loglinear presmoothing supports multivariate
+    frequency distributions, e.g., distributions
+    with multiple anchor tests. Polynomials and
+    interactions can be specified using a matrix
+    of power terms, in addition to the score function
+    or the degree (now 'degrees') argument.
+    
+  o Impossible scores can be removed before loglinear
+    presmoothing using the 'rmimpossible' argument.
+
+  o Model comparisons for loglinear presmoothing
+    are based on the 'models' argument, which is
+    a numeric vector with different levels specifying
+    the sequential models to be fitted. Also, when
+    'stepup' is TRUE, the default models are now chosen
+    based on common powers across variables.
+
+  o The default legend for plotting bootstrap output
+    was fixed.
+    
+  o Summary method for bootstrap output can take
+    a subset of the score scale. The method was also
+    updated to include weighted mean RMSE.
+
 equate_2.0-2 (2014-2-21)
 
   o Some minor cleanup.

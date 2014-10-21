@@ -3,76 +3,103 @@
 # and plotting frequency tables
 
 #----------------------------------------------------------------
-# Main function for creating a frequency table
+# Generic freqtab function
 
-freqtab <- function(x, v, xitems = 1:ncol(x),
-	vitems = 1:ncol(v), xscale, vscale, na.rm = TRUE) {
+freqtab <- function(x, ...) UseMethod("freqtab")
 
-	x <- cbind(x)
+#----------------------------------------------------------------
+# Default data.frame method
+# For data.frame of item responses
+# or data.frame of total and anchor scores
+# or vector of total scores
+
+freqtab.default <- function(x, scales, items,
+	na.rm = TRUE, ...) {
+
+	x <- data.frame(x)
+	# Create row sums, if items are provided	
+	if(!missing(items)) {
+		if(!is.list(items))
+			items <- list(items)
+		x <- sapply(items, function(i) {
+			if(is.factor(i))
+				i <- as.character(i)
+			rowSums(x[, i], na.rm = na.rm)
+			})
+	}
+
+	# Convert to factors
+	nx <- ncol(x)
+	x <- as.data.frame(x,
+		row.names = seq_len(nrow(x)))
+	if(missing(scales))
+		scales <- apply(x, 2, function(y)
+			min(y):max(y))
+	if(!is.list(scales))
+		scales <- list(scales)
+	for(i in 1:nx)
+		x[, i] <- factor(as.character(x[, i]),
+			levels = scales[[i]])
 	
-	if(ncol(x) > 1) {
-		if(is.factor(xitems))
-			xitems <- as.character(xitems)
-		xt <- apply(x[, xitems], 1, sum, na.rm = na.rm)		
-	}
-	else
-		xt <- x
+	out <- freqtab.table(table(x))
 
-	if(!missing(v)) {
-		if(ncol(cbind(v)) > 1) {
-			if(is.factor(vitems))
-				vitems <- as.character(vitems)
-			vt <- apply(v[, vitems], 1, sum, na.rm = na.rm)
-		}
-		else
-			vt <- v
-	}
-	else if(!missing(vitems)) {
-		if(is.factor(vitems))
-			vitems <- as.character(vitems)
-		vt <- apply(x[, vitems], 1, sum, na.rm = na.rm)
-	}
-	else
-		vt <- NULL
-
-	xtc <- xt[complete.cases(xt, vt)]
-	vtc <- vt[complete.cases(xt, vt)]
-	
-	if(missing(xscale))
-		xscale <- min(xtc):max(xtc)
-	if(is.null(vt)) {
-		out <- cbind(xscale,
-			as.vector(table(factor(xtc, levels = xscale))))
-	}
-	else {
-		if(missing(vscale))
-			vscale <- min(vtc):max(vtc)
-		temptab <- table(factor(vtc, levels = vscale),
-			factor(xtc, levels = xscale))
-		out <- cbind(rep(xscale, each = length(vscale)),
-			rep(vscale, length(xscale)), as.vector(temptab))
-	}
-	out <- as.freqtab(out)
-
-  return(out)
+	return(out)
 }
 
 #----------------------------------------------------------------
-# Assign freqtab class
+# Assign freqtab class and attributes
+# based on scales
 
-as.freqtab <- function(x) {
+as.freqtab <- function(x, scales, drop = FALSE, ...) {
+	# x: either a vector of counts, or a frequency
+	# table as a matrix or data.frame where the last
+	# column contains counts
+	# scales: a list of scales, i.e., factor levels,
+	# for each variable, by default created using unique
+	# values from each. Must be in correct order!
+	# drop: drop levels with zero counts across all
+	# other factors - you can't drop if x is vector
+	# adding levels with zero counts is achieved by
+	# including those values in scales and setting drop
+	# to FALSE
+	# You can't drop current zeros and then add new ones
+	
+	x <- as.data.frame(x)
+	nx <- ncol(x) - 1
 
-	x <- as.data.frame(unclass(x))
-	if(ncol(x) == 3)
-		colnames(x) <- c("total", "anchor", "observed")
-	else if(ncol(x) == 2)
-		colnames(x) <- c("total", "observed")
-	else
-		stop("incorrect number of columns")
-	rownames(x) <- NULL
-	class(x) <- c("freqtab", "data.frame")
+	# If x is a vector of counts, scales must be supplied
+	if(nx == 0) {
+		dm <- sapply(scales, length)
+		if(nrow(x) != prod(dm))
+			stop("'scales' do not match dimensions of 'x'")
+		out <- array(unlist(x), dm, dimnames = scales)
+	}
+	else {
+		if(drop)
+			x <- x[x[, nx + 1] > 0, ]
 
-	return(x)
+		# Set scales
+		if(missing(scales)) {
+			if(nx == 1)
+				scales <- list(unique(x[, 1]))
+			else if(nx > 1)
+				scales <- lapply(x[, -(nx + 1)], function(y)
+					as.character(sort(unique(y))))
+			else
+				stop("'scales' cannot be inferred from 'x'")
+		}
+		else if(!is.list(scales))
+			scales <- list(scales)
+		# Refactor like in xtabs
+		xf <- lapply(1:nx, function(i) {
+			factor(as.character(x[, i]),
+				levels = scales[[i]])[, drop = drop]
+		})
+    	out <- tapply(x[, nx + 1], xf, sum)
+	    out[is.na(out)] <- 0
+	}
+
+	return(freqtab.table(as.table(out)))
 }
 
 #----------------------------------------------------------------
@@ -84,29 +111,117 @@ is.freqtab <- function(x) {
 }
 
 #----------------------------------------------------------------
-# Convert bivariate frequency table to univariate by
-# summing over one margin
+# table method
 
-mfreqtab <- function(x, margin = 1) {
+freqtab.table <- function(x, ...) {
+	
+	# Set attributes, mainly dnn
+	out <- c(x)
+	attributes(out) <- attributes(x)
+	nx <- margins(x)
+	dnn <- "total"
+	if(nx == 2)
+		dnn[2] <- "anchor"
+	else if(nx > 2)
+		dnn[2:nx] <- paste("anchor",
+			1:(nx - 1), sep = "")
+	names(dimnames(out)) <- dnn
+	class(out) <- c("freqtab", "table")
+	
+	return(out)
+}
 
-	if(!is.freqtab(x))
-		stop("class of 'x' must be 'freqtab'")
-	return(as.freqtab(cbind(unique(x[, margin]),
-		tapply(x[, ncol(x)], x[, margin], sum))))
+#----------------------------------------------------------------
+# Function for converting to data.frame
+# All factors are converted to numeric
+
+as.data.frame.freqtab <- function(x, row.names = NULL,
+	optional = FALSE, drop = FALSE, ...) {
+	
+	out <- as.data.frame.table(x, row.names = NULL,
+		responseName = "count", stringsAsFactors = TRUE)
+	out <- sapply(out, function(y)
+		as.numeric(as.character(y)))
+	if(drop)
+		out <- out[out[, ncol(out)] > 0, ]
+
+	return(as.data.frame(out))
+}
+
+#----------------------------------------------------------------
+# head and tail methods
+
+head.freqtab <- function(x, ...) {
+	
+	head(as.data.frame(x), ...)
+}
+
+tail.freqtab <- function(x, ...) {
+	
+	tail(as.data.frame(x), ...)
+}
+
+#----------------------------------------------------------------
+# print method
+
+print.freqtab <- function(x, ...) {
+	
+	print(as.data.frame(x))
+}
+
+#----------------------------------------------------------------
+# Function for extracting scales
+
+scales <- function(x, margin = 1) {
+	
+	if(length(margin) == 1)
+		return(as.numeric(dimnames(x)[[margin]]))
+	else if(length(margin) > 1)
+		return(lapply(dimnames(x)[margin], as.numeric))
+}
+
+#----------------------------------------------------------------
+# Wrapper for margin.table
+
+margin <- function(x, margin = 1) {
+	
+	if(any(!margin %in% seq(margins(x))))
+		stop("misspecified margins")
+
+	return(margin.table(x, margin))
+}
+
+#----------------------------------------------------------------
+# Function for getting the number of margins
+
+margins <- function(x) {
+	
+	return(length(dim(x)))
+}
+
+#----------------------------------------------------------------
+# Function for dropping unused levels
+
+droplevels.freqtab <- function(x, ...) {
+	
+	xd <- as.data.frame(x)[x > 0, ]
+	return(as.freqtab(droplevels(xd)))
 }
 
 #----------------------------------------------------------------
 # Plot method
+# For plotting univariate and bivariate frequency distributions
 
 plot.freqtab <- function(x, y = NULL, xcol = 1,
 	ycol, pch = 16, ylty = 1, xlab = "Total Test",
 	addlegend = !missing(y), legendtext, ...) {
 	
-	if(ncol(x) == 2)
+	nx <- margins(x)
+	if(nx == 1)
 		ufreqplot(x, y, xcol, ycol, ylty, xlab,
 			horiz = FALSE, addlegend = addlegend,
 			legendtext = legendtext, ...)
-	else if(ncol(x) == 3)
+	else if(nx == 2)
 		bfreqplot(x, y, xcol, ycol, pch, ylty, xlab,
 			addlegend = addlegend,
 			legendtext = legendtext, ...)
@@ -121,6 +236,7 @@ ufreqplot <- function(x, y = NULL, xcol = 1, ycol,
 	horiz = FALSE, addlegend = FALSE,
 	legendtext, ...) {
 
+	x <- as.data.frame(x)
 	if(!is.null(y)) {
 		if(is.freqtab(y))
 			y <- cbind(y[, 2])
@@ -168,15 +284,19 @@ bfreqplot <- function(x, y = NULL, xcol = 1,
 	ylab = "Anchor Test", addlegend = FALSE,
 	legendtext, ...) {
 
+	xtab <- margin(x)
+	xvtab <- margin(x, 2)
+	xd <- as.data.frame(x)
+
 	if(!is.null(y)) {
 		if(is.freqtab(y))
-			y <- cbind(y[, 3])
+			y <- cbind(c(y))
 		if(missing(ycol))
 			ycol <- rainbow(ncol(y))
 		ytab <- apply(y, 2, function(z)
-			tapply(z, x[, 1], sum))
+			tapply(z, xd[, 1], sum))
 		yvtab <- apply(y, 2, function(z)
-			tapply(z, x[, 2], sum))
+			tapply(z, xd[, 2], sum))
 	}
 	else ytab <- yvtab <- NULL
 	
@@ -184,17 +304,15 @@ bfreqplot <- function(x, y = NULL, xcol = 1,
 	nf <- layout(matrix(c(2, 4, 1, 3), 2, 2,
 		byrow = TRUE), c(3, 1), c(1, 3), TRUE)
 	par(mar = c(4, 4, 1, 1))
-	plot(range(x[, 1]), range(x[, 2]), type = "n",
+	plot(range(xtab), range(xvtab), type = "n",
 		xlab = xlab, ylab = ylab, ...)
-	points.freqtab(x, xcol = xcol, pch = pch)
+	points(x, xcol = xcol, pch = pch)
 
 	par(mar = c(0, 4, 1, 1))
-	xtab <- mfreqtab(x)
 	ufreqplot(xtab, ytab, xcol, ycol, ylty,
 		xlab = "", ylab = "", xaxt = "n", bty = "n")
 
 	par(mar = c(4, 0, 1, 1))
-	xvtab <- mfreqtab(x, 2)
 	ufreqplot(xvtab, yvtab, xcol, ycol, ylty,
 		xlab = "", ylab = "", yaxt = "n", bty = "n",
 		horiz = TRUE)
@@ -216,9 +334,11 @@ bfreqplot <- function(x, y = NULL, xcol = 1,
 #----------------------------------------------------------------
 # Points method
 
-points.freqtab <- function(x, xcol = 1, pch = 16, ...) {
+points.freqtab <- function(x, xcol = 1, pch = 16,
+	ds = 50, dm = 100, ...) {
 	
-	if(ncol(x) < 3)
+	x <- as.data.frame(x)
+	if(ncol(x) != 3)
 		stop("'x' must be a bivariate frequency table")
 		
 	index <- as.logical(x[, 3])
@@ -226,7 +346,7 @@ points.freqtab <- function(x, xcol = 1, pch = 16, ...) {
 	vpoints <- x[index, 2]
 	if(sd(x[index, 3]) > 0)
 		dens <- pmax(0, pmin(255,
-			scale(x[index, 3])*50 + 100))
+			scale(x[index, 3]) * ds + dm))
 	else dens <- rep(150, sum(index))
 	rgbcol <- col2rgb(xcol)
 	ptcol <- rgb(rgbcol[1], rgbcol[2], rgbcol[3],
@@ -238,146 +358,269 @@ points.freqtab <- function(x, xcol = 1, pch = 16, ...) {
 #----------------------------------------------------------------
 # Summary method
 
-summary.freqtab <- function(object, ...) {
+summary.freqtab <- function(object,
+	margin = seq(margins(object)), ...) {
 	
-	nc <- ncol(object) - 1
 	out <- NULL
-	for(i in 1:nc)
-		out <- rbind(out,
-			descript(object[, c(i, nc + 1)]))
-	rownames(out)[1:nc] <- c("total", "anchor")[1:nc]
+	for(i in margin) {
+		xm <- margin(object, i)
+		out <- rbind(out, data.frame(
+			mean = mean(xm),
+			sd = sd.freqtab(xm),
+			skew = skew.freqtab(xm),
+			kurt = kurt.freqtab(xm),
+			min = min(xm),
+			max = max(xm),
+			n = sum(xm)))
+	}
+	rownames(out) <- names(dimnames(object))[margin]
+
 	return(out)
-}
-
-#----------------------------------------------------------------
-# Internal descriptives function
-# For univariate frequency table
-
-descript <- function(x) {
-	if(is.freqtab(x))
-		return(data.frame(
-			mean = mean.freqtab(x),
-			sd = sd.freqtab(x),
-			skew = skew.freqtab(x),
-			kurt = kurt.freqtab(x),
-			min = min.freqtab(x),
-			max = max.freqtab(x),
-			n = sum(x[, 2])))
 }
 
 #----------------------------------------------------------------
 # Mean
 
-mean.freqtab <- function(x, ...) {
+mean.freqtab <- function(x, margin = 1, ...) {
 
-	return(sum(x[, 1]*x[, ncol(x)])/sum(x[, ncol(x)]))
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		sum(xm*scales(xm)/sum(xm))})
+
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Standard deviation
 
-sd.freqtab <- function(x) {
+sd.freqtab <- function(x, margin = 1) {
 
-	return(sqrt(cov.freqtab(x[, c(1, ncol(x))])))
+	return(sqrt(var.freqtab(x, margin)))
+}
+
+#----------------------------------------------------------------
+# Variance
+
+var.freqtab <- function(x, margin = 1) {
+	
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	n <- sum(x)
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		xsc <- scales(xm)
+		(sum(xsc*xsc*xm) - (sum(xm*xsc)^2)/n)/(n - 1)})
+
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Covariance
 
-cov.freqtab <- function(x) {
+cov.freqtab <- function(x, margin = seq(margins(x))) {
 
-	nc <- ncol(x)
-	i <- x[, nc] > 0
-	xc <- x[i, 1] - mean.freqtab(x)
-	vc <- x[i, nc - 1] - mean.freqtab(x[, (nc - 1):nc])
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	n <- sum(x)
+	nx <- length(margin)
+	out <- matrix(nrow = nx, ncol = nx)
+	for(i in 1:nx) {
+		out[i, i:nx] <- out[i:nx, i] <-
+			sapply(margin[i:nx], function(j) {
+				xd <- as.data.frame(margin(x,
+					unique(c(i, j))))
+				nc <- ncol(xd)
+				sum((xd[, 1] - mean(x, i))*
+					(xd[, nc - 1] - mean(x, j))*
+					xd[, nc])/(n - 1)})
+	}
 
-	return(sum(xc*vc*x[i, nc])/(sum(x[, nc]) - 1))
+	attr(out, "dim") <- c(nx, nx)
+	attr(out, "dimnames") <- list(names(dimnames(x))[margin],
+		names(dimnames(x))[margin])
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Correlation
 
-cor.freqtab <- function(x) {
+cor.freqtab <- function(x, margin = seq(margins(x))) {
 
-	return(cov.freqtab(x)/(sd.freqtab(x[, -2])*sd.freqtab(x[, -1])))
+	sds <- 1/sd.freqtab(x, margin)
+	covs <- cov.freqtab(x, margin)
+	out <- diag(sds) %*% covs %*% diag(sds)
+	attributes(out) <- attributes(covs)
+
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Minimum
 
-min.freqtab <- function(x, ..., na.rm = FALSE) {
+min.freqtab <- function(x, margin = 1, ..., na.rm = FALSE) {
 
-	return(min(x[as.logical(x[, ncol(x)]), 1]))
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		min(scales(xm)[as.logical(xm)])})
+
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Maximum
 
-max.freqtab <- function(x, ..., na.rm = FALSE) {
+max.freqtab <- function(x, margin = 1, ..., na.rm = FALSE) {
 
-	return(max(x[as.logical(x[, ncol(x)]), 1]))
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		max(scales(xm)[as.logical(xm)])})
+
+	return(out)
+}
+
+#----------------------------------------------------------------
+# Range
+
+range.freqtab <- function(x, margin = 1, ...,
+	na.rm = FALSE) {
+
+	if(length(margin) == 1)
+		out <- c(min(x), max(x))
+	else if(length(margin) > 1)
+		out <- lapply(margin, function(i)
+			c(min(margin(x, i)), max(margin(x, i))))
+
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Skewness
 
-skew.freqtab <- function(x) {
+skew.freqtab <- function(x, margin = 1) {
 
-	nc <- ncol(x)
-	i <- x[, nc] > 0
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	n <- sum(x)
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		xsc <- scales(xm)
+		sum(((xsc - mean(xm))^3*xm))/(n)/
+			(sum(((xsc - mean(xm))^2*xm))/(n - 1))^1.5})
 
-	return(sum(((x[i, 1] - mean.freqtab(x))^3)*x[i, nc])/
-		(sum(x[i, nc]) - 1)/cov.freqtab(x[, c(1, nc)])^1.5)
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Kurtosis
 
-kurt.freqtab <- function(x) {
+kurt.freqtab <- function(x, margin = 1) {
 
-	nc <- ncol(x)
-	i <- x[, nc] > 0
+	inmars <- margin %in% seq(margins(x))
+	if(any(!inmars)) {
+		margin <- margin[inmars]
+		warning("misspecified margins ",
+			"have been removed.")
+	}
+	n <- sum(x)
+	out <- sapply(margin, function(i) {
+		xm <- margin(x, i)
+		xsc <- scales(xm)
+		sum(((xsc - mean(xm))^4*xm))/(n)/
+			(sum(((xsc - mean(xm))^2*xm))/(n - 1))^2 - 3})
 
-	return(sum(((x[i, 1] - mean.freqtab(x))^4)*x[i, nc])/
-		(sum(x[i, nc]) - 1)/cov.freqtab(x[, c(1, nc)])^2)
+	return(out)
 }
 
 #----------------------------------------------------------------
 # Cumulative frequency
 
-fx <- function(x) {
+fx <- function(x, ...) UseMethod("fx")
 
-	if(!is.null(dim(x)))
-		x <- x[, ncol(x)]
-	x <- x/sum(x)
+fx.default <- function(x, ...) {
+	
+	return(as.numeric(cumsum(x/sum(x))))
+}
 
-	f <- numeric(length(x))
-	for(i in 1:length(x))
-		f[i] <- sum(x[1:i])
-
-	return(f)
+fx.freqtab <- function(x, margin = 1, ...) {
+	
+	if(!margin %in% seq(margins(x)))
+		stop("'margin' not found in 'x'")
+	
+	return(fx.default(margin(x, margin)))
 }
 
 #----------------------------------------------------------------
-# Percentile ranks
+# Percentile ranks with linear interpolation
 
-px <- function(x, y) {
+px <- function(x, ...) UseMethod("px")
 
-	if(is.freqtab(x) & missing(y)) {
-		x[, 2] <- x[, 2]/sum(x[, 2])
-		p <- .5*x[1, 2]
-		for(i in 2:nrow(x))
-			p[i] <- sum(x[1:(i - 1), 2]) + .5*x[i, 2]
+px.default <- function(x, y, ys, ...) {
+
+	if(missing(y)) {
+		x <- as.numeric(x/sum(x))
+		p <- .5 * x[1]
+		for(i in 2:length(x))
+			p[i] <- sum(x[1:(i - 1)]) + .5 * x[i]
 	}
-	else if(is.freqtab(y)) {
-		x <- cbind(x)[, 1]
+	else {
+		y <- as.data.frame(y)
+		if(ncol(y) == 2) {
+			ys <- y[, 1]
+			y <- y[, 2]
+		}
 		xs <- floor(x + .5)
-		yn <- sum(y[, 2])
-		f <- sapply(xs, function(x)
-			sum(y[y[, 1] <= x, 2])/yn)
-		flow <- sapply(xs, function(x)
-			sum(y[y[, 1] <= x - 1, 2])/yn)
-		p <- flow + (x - (xs - .5))*(f - flow)
+		yn <- sum(y)
+		f <- sapply(xs, function(xi)
+			sum(y[ys <= xi])/yn)
+		flow <- sapply(xs, function(xi)
+			sum(y[ys <= xi - 1])/yn)
+		p <- flow + (x - (xs - .5)) * (f - flow)
+	}
+	return(p)
+}
+
+px.freqtab <- function(x, margin = 1,
+	y, ymargin = 1, ...) {
+
+	if(!margin %in% seq(margins(x)))
+		stop("'margin' not found in 'x'")
+	if(missing(y))
+		p <- px.default(margin(x, margin))
+	else {
+		if(!ymargin %in% seq(margins(y)))
+			stop("'ymargin' not found in 'y'")
+		p <- px.default(scales(margin(x, margin)),
+			as.data.frame(margin(y, ymargin)))
 	}
 
 	return(p)

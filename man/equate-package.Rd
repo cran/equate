@@ -5,12 +5,12 @@
 Observed-Score Linking and Equating
 }
 \description{
-The equate package contains methods for observed-score linking and equating under the single-group, equivalent-groups, and nonequivalent-groups designs. Equating types include identity, mean, linear, general linear, equipercentile, circle-arc, and composites of these types. Equating methods include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating. Plotting and summary methods, and methods for univariate and bivariate presmoothing are also provided.}
+Contains methods for observed-score linking and equating under the single-group, equivalent-groups, and nonequivalent-groups with anchor test(s) designs. Equating types include identity, mean, linear, general linear, equipercentile, circle-arc, and composites of these. Equating methods include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating. Plotting and summary methods, and methods for multivariate presmoothing and bootstrap error estimation are also provided.}
 \details{
 \tabular{ll}{
 Package: \tab equate\cr
-Version: \tab 2.0-2\cr
-Date: \tab 2014-2-21\cr
+Version: \tab 2.0-3\cr
+Date: \tab 2014-10-21\cr
 Depends: \tab R (>= 3.0.0)\cr
 License: \tab GPL (>= 2)\cr
 }
@@ -21,6 +21,7 @@ ACTmath                 ACT Mathematics Test Scores
 KBneat                  Test Scores under a NEAT design
 PISA                    Programme for International Student Assessment 2009 USA Data
 descriptives            Descriptive Statistics for Frequency Tables
+percentiles             Percentile ranks and Cumulative Frequencies for Frequency Tables
 equate                  Observed Score Linking and Equating
 composite               Composite Linking and Equating
 bootstrap               Bootstrap Equating Error

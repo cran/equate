@@ -70,21 +70,20 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{equate}}, \code{\link{plot.bootstrap}}
 }
 \examples{
-x <- freqtab(KBneat$x[, 1], xscale = 0:36,
-  v = KBneat$x[, 2], vscale = 0:12)
-y <- freqtab(KBneat$y[, 1], xscale = 0:36,
-  v = KBneat$y[, 2], vscale = 0:12)
+x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
+y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
 
 set.seed(111213)
 eq1 <- equate(x, y, type = "linear", method = "tuck",
-  boot = TRUE, reps = 20)
+  boot = TRUE, reps = 10)
 eq2 <- equate(x, y, type = "equip", method = "freq",
-  boot = TRUE, smooth = "log", reps = 20)
+  boot = TRUE, smooth = "log", reps = 10,
+  showWarnings = FALSE)
 eq3 <- equate(x, y, type = "linear", method = "braun",
-  boot = TRUE, reps = 20)
+  boot = TRUE, reps = 10, showWarnings = FALSE)
 
 plot(eq1, eq2, eq3)
 plot(eq1, eq2, eq3, out = "se", legendplace = "top",
-	addident = FALSE)
+  addident = FALSE)
 }
 \keyword{misc}

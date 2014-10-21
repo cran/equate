@@ -1,42 +1,49 @@
 \name{descriptives}
 \alias{summary.freqtab}
-\alias{descript}
 \alias{mean.freqtab}
 \alias{sd.freqtab}
-\alias{skew.freqtab}
-\alias{kurt.freqtab}
-\alias{max.freqtab}
-\alias{min.freqtab}
+\alias{var.freqtab}
 \alias{cov.freqtab}
 \alias{cor.freqtab}
-\alias{px}
-\alias{fx}
+\alias{min.freqtab}
+\alias{max.freqtab}
+\alias{range.freqtab}
+\alias{skew.freqtab}
+\alias{kurt.freqtab}
 \title{Descriptive Statistics for Frequency Tables}
 \description{
 These functions return descriptive statistics for a frequency table of class \dQuote{\code{\link{freqtab}}}.
 }
 \usage{
-\method{summary}{freqtab}(object, ...)
+\method{summary}{freqtab}(object, margin = seq(margins(object)), ...)
 
-\method{mean}{freqtab}(x, ...)
+\method{mean}{freqtab}(x, margin = 1, ...)
 
-sd.freqtab(x)
+sd.freqtab(x, margin = 1)
 
-skew.freqtab(x)
+var.freqtab(x, margin = 1)
 
-kurt.freqtab(x)
+cov.freqtab(x, margin = seq(margins(x)))
 
-\method{min}{freqtab}(x, ..., na.rm = FALSE)
+cor.freqtab(x, margin = seq(margins(x)))
 
-\method{max}{freqtab}(x, ..., na.rm = FALSE)
+\method{min}{freqtab}(x, margin = 1, ..., na.rm = FALSE)
 
-cov.freqtab(x)
+\method{max}{freqtab}(x, margin = 1, ..., na.rm = FALSE)
 
-cor.freqtab(x)
+\method{range}{freqtab}(x, margin = 1, ..., na.rm = FALSE)
+
+skew.freqtab(x, margin = 1)
+
+kurt.freqtab(x, margin = 1)
+
 }
 \arguments{
   \item{object, x}{
-two-column matrix of class \dQuote{\code{\link{freqtab}}}, where column 1 specifies the score scale and column 2 the frequencies for each score point. If \code{x} is a three-column bivariate frequency table, \code{summary}, \code{cov.freqtab}, and \code{cor.freqtab} will utilize both variables, otherwise, only the first is used (see examples).
+object of class \dQuote{\code{freqtab}}.
+}
+  \item{margin}{
+integer vector specifying the margin(s) for which summary statistics will be returned. This defaults to \code{1} for univariate statistics, and \code{seq(margins(x))}, i.e., all the margins, for multivariate statistics (covariance and correlation).
 }
   \item{\dots}{
 further arguments passed to or from other methods.
@@ -46,10 +53,12 @@ logical indicating whether missing values should be removed, currently ignored s
 }
 }
 \details{
-\code{mean.freqtab}, \code{sd.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, skewness, and kurtosis. \code{min.freqtab} and \code{max.freqtab} return the maximum and minimum observed scores. \code{cov.freqtab} and \code{cor.freqtab} return the covariance and correlation for a bivariate frequency table.
+\code{mean}, \code{sd.freqtab}, \code{var.freqtab}, \code{skew.freqtab}, and \code{kurt.freqtab} return the mean, standard deviation, variance, skewness, and kurtosis. \code{min} and \code{max} return the minimum and maximum observed scores, and \code{range} returns both. \code{cov.freqtab} and \code{cor.freqtab} return the covariance and correlation matrices for one or more variables.
+
+\code{summary} returns univariate statistics across one or more margins.
 }
 \value{
-\code{summary} returns a data frame of summary statistics, including the mean, standard deviation, skewness, kurtosis, minimum, maximum, and number of observations for each variable in \code{x}. Otherwise, a vector of length one is returned with the corresponding statistic.
+\code{summary} returns a data frame of summary statistics, including the mean, standard deviation, skewness, kurtosis, minimum, maximum, and number of observations for each variable in \code{margin}. Otherwise, a vector of length \code{length(margin)} is returned with the corresponding statistic for each variable.
 }
 \author{
 Anthony Albano \email{tony.d.albano@gmail.com}
@@ -58,13 +67,10 @@ Anthony Albano \email{tony.d.albano@gmail.com}
 \code{\link{freqtab}}
 }
 \examples{
-x <- as.freqtab(ACTmath[, 1:2])
-summary(x)
+summary(as.freqtab(ACTmath[, 1:2]))
 
-y <- freqtab(KBneat$y[, 1], KBneat$y[, 2],
-  xscale = 0:36, vscale = 0:12)
-summary(y)
-cov.freqtab(y)
-cov(KBneat$y[, 1], KBneat$y[, 2])
+ny <- freqtab(KBneat$y, scales = list(0:36, 0:12))
+summary(ny)
+cov.freqtab(ny)
 }
-\keyword{univar}
+\keyword{methods}
