@@ -64,55 +64,56 @@ equipercentile <- function(x, y, method = "none",
 # Does it work for shrunken or stretched scales? Yes, now.
 # Previously, it is assumed that scores were in 1 point increments
 
-equip <- function(x, y, ky = max(scales(y))) {
+equip <- function(x, y, ly = min(scales(y)),
+	ky = max(scales(y))) {
 
 	yscale <- scales(y)
 	yn <- sum(y)
-	if(!is.freqtab(x)) {
+	if (!is.freqtab(x)) {
 		prank <- sort(unique(x))
 		xscale <- yscale
 		xn <- 0
-	}
-	else {
+	} else {
 		prank <- round(px(x), 10)
 		xscale <- scales(x)
 		xn <- sum(x)
-		#se <- vector(length = length(prank))
+		#se <- rep(NA, length = length(prank))
 	}
-	yinc <- round(diff(yscale)[1], 8)
-	if(any(round(diff(yscale), 8) != yinc))
-		stop("'y' scale must be equal-interval")
-	hinc <- yinc/2
+	sn <- length(yscale)
+	yinc <- round(diff(yscale), 8)
+	yincl <- c(yinc[1]/2, yinc/2)
+	yinch <- c(yinc/2, yinc[sn - 1]/2)
 	yx <- numeric(length = length(prank))
 	fy <- round(fx(y), 10)
-	sn <- length(yscale)
-	Ly <- min(yscale)
 	xnone <- prank == 0
 	xone <- prank == 1
 	xbot <- sum(xnone) + 1
 	xtop <- sum(!xone)
 	yxi <- xbot:xtop
-	xyone <- which(xscale[xone] > (ky + hinc)) + xtop
+	xyone <- which(xscale[xone] > (ky + yinch[sn])) + xtop
 
-	yx[xnone] <- Ly - hinc
-	yx[xone] <- ky + hinc
+	yx[xnone] <- ly - yincl[1]
+	yx[xone] <- ky + yinch[sn]
 	yx[xyone] <- xscale[xyone]
-	if(any(yx == 0)) {
+	if (any(yx == 0)) {
 		yu <- sapply(yxi, function(i)
 			sum(fy <= prank[i]) + 1)
 		yu2 <- yu - 1
 		yu2[yu2 > 0] <- fy[yu2]
 		g0 <- fy[yu] - yu2
-		yx[yxi] <- yscale[yu] - hinc +
-			((prank[yxi] - yu2)/g0)*yinc
+		yx[yxi] <- yscale[yu] - yincl[yu] +
+			((prank[yxi] - yu2)/g0) * (yinch + yincl)[yu]
 		# standard errors
+		#if(xn)
+		#	se[yxi] <- seege(prank[yxi], g0, yu2, xn, yn)
 		if(any(y == 0)) {
 			yxi <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
 			yl <- sapply(yxi, function(i)
 				sum(fy < prank[i]))
 			yl2 <- fy[yl + 1]
-			yxtemp <- yscale[yl] + hinc + ((prank[yxi] - fy[yl])/
-				(yl2 - fy[yl]))*yinc
+			yxtemp <- yscale[yl] + yincl[yu] +
+				((prank[yxi] - fy[yl])/(yl2 - fy[yl])) *
+				(yinch + yincl)[yu]
 			yx[yxi] <- (yx[yxi] + yxtemp)/2
 		}
 	}

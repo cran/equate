@@ -111,8 +111,8 @@ pse <- function(x, y, ws) {
 		as.character)[yi, ]
 	xs <- x
 	ys <- y
-	xs[xi] <- ws*x[xi] + (1 - ws)*x[xi]/h1[h1i]*h2[h1i]
-	ys[yi] <- ws*y[yi]/h2[h2i]*h1[h2i] + (1 - ws)*y[yi]
+	xs[xi] <- ws * x[xi] + (1 - ws) * x[xi]/h1[h1i] * h2[h1i]
+	ys[yi] <- ws * y[yi]/h2[h2i] * h1[h2i] + (1 - ws) * y[yi]
 	xs <- as.freqtab(xs, scales(x, 1:margins(x)))
 	ys <- as.freqtab(ys, scales(y, 1:margins(y)))
 	
