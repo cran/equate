@@ -1,6 +1,6 @@
 Package: equate
 Type: Package
-Version: 2.0-4
+Version: 2.0-5
 Title: Observed-Score Linking and Equating
 Author: Anthony Albano <tony.d.albano@gmail.com>
 Maintainer: Anthony Albano <tony.d.albano@gmail.com>
@@ -24,6 +24,6 @@ LazyData: yes
 License: GPL-3
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-04-26 04:29:17 UTC; talbano
+Packaged: 2016-10-21 00:35:12 UTC; talbano
 Repository: CRAN
-Date/Publication: 2016-04-26 08:44:19
+Date/Publication: 2016-10-21 10:32:40
