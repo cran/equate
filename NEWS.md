@@ -1,3 +1,17 @@
+# equate_2.0-6 (2017-01-09)
+
+* bootstrap function can now extract presmoothing arguments, if present, to run presmoothing once for all functions requesting it. Note that, when requested, presmoothed score distributions will be used for all methods.
+
+* New fit statistics for loglinear presmoothing model comparison: likelihood ratio chi-square, Freeman-Tukey chi-square, consistent AIC, Cressie-Read, and Goodman.
+
+* Fix plot axes in plot.freqtab where scales do not match observed score range.
+
+* Legend text fixed for single-group and equivalent-groups designs in plot.equate and plot.bootstrap.
+
+* Algorithm for default model comparison in loglinear presmoothing was fixed to address problem with degrees of 10 or larger.
+
+* Bug in Levine true score equating, introduced in 2.0.5, was fixed.
+
 # equate_2.0-5 (2016-10-20)
 
 * Support for linear equating in a single-group design with counterbalancing.

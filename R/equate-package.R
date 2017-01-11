@@ -9,8 +9,8 @@
 #' equating. Plotting and summary methods, and methods for multivariate
 #' presmoothing and bootstrap error estimation are also provided.
 #' 
-#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-5\cr Date: \tab
-#' 2016-10-20\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
+#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-6\cr Date: \tab
+#' 2017-01-09\cr Depends: \tab R (>= 3.3.2)\cr License: \tab GPL-3\cr }
 #' 
 #' Index: \tabular{ll}{
 #' ACTmath \tab ACT Mathematics Test Scores\cr
@@ -38,7 +38,8 @@
 #' @docType package
 #' @author Anthony Albano <tony.d.albano@@gmail.com>
 #' @importFrom stats AIC BIC as.formula coef fitted formula glm lm median
-#' model.matrix poisson reformulate sd stat.anova terms
+#' model.matrix poisson reformulate sd stat.anova terms deviance df.residual
+#' nobs pchisq
 #' @importFrom graphics layout legend lines matlines par plot plot.default
 #' points segments
 #' @importFrom grDevices col2rgb rainbow rgb
