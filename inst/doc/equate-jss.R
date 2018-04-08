@@ -1,14 +1,14 @@
-### R code from vignette source 'equatevignette.Rnw'
+### R code from vignette source 'equate-jss.Rnw'
 
 ###################################################
-### code chunk number 1: equatevignette.Rnw:375-377
+### code chunk number 1: equate-jss.Rnw:375-377
 ###################################################
 op <- options()
 options(prompt = "R> ", show.signif.stars = FALSE, warn = -1, continue = "+    ")
 
 
 ###################################################
-### code chunk number 2: equatevignette.Rnw:379-382
+### code chunk number 2: equate-jss.Rnw:379-382
 ###################################################
 library("equate")
 act.x <- as.freqtab(ACTmath[, 1:2])
@@ -16,21 +16,21 @@ act.y <- as.freqtab(ACTmath[, c(1, 3)])
 
 
 ###################################################
-### code chunk number 3: equatevignette.Rnw:385-387
+### code chunk number 3: equate-jss.Rnw:385-387
 ###################################################
 head(act.x)
 rbind(x = summary(act.x), y = summary(act.y))
 
 
 ###################################################
-### code chunk number 4: equatevignette.Rnw:390-392
+### code chunk number 4: equate-jss.Rnw:390-392
 ###################################################
 neat.x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
 neat.y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
 
 
 ###################################################
-### code chunk number 5: equatevignette.Rnw:396-406
+### code chunk number 5: equate-jss.Rnw:396-406
 ###################################################
 attach(PISA)
 r3items <- paste(items$itemid[items$clusterid == "r3a"])
@@ -45,7 +45,7 @@ row.names = c("r3r6", "r5r7")), 2)
 
 
 ###################################################
-### code chunk number 6: equatevignette.Rnw:410-412
+### code chunk number 6: equate-jss.Rnw:410-412
 ###################################################
 plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 plot(neat.x)
@@ -64,26 +64,26 @@ plot(neat.x)
 
 
 ###################################################
-### code chunk number 9: equatevignette.Rnw:422-423
+### code chunk number 9: equate-jss.Rnw:422-423
 ###################################################
 plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 
 
 ###################################################
-### code chunk number 10: equatevignette.Rnw:432-433
+### code chunk number 10: equate-jss.Rnw:432-433
 ###################################################
 plot(neat.x)
 
 
 ###################################################
-### code chunk number 11: equatevignette.Rnw:444-446 (eval = FALSE)
+### code chunk number 11: equate-jss.Rnw:444-446 (eval = FALSE)
 ###################################################
 ## presmoothing(~ poly(total, 3, raw = T) + poly(anchor, 3, raw = T) +
 ## total:anchor, data = neat.x)
 
 
 ###################################################
-### code chunk number 12: equatevignette.Rnw:451-454 (eval = FALSE)
+### code chunk number 12: equate-jss.Rnw:451-454 (eval = FALSE)
 ###################################################
 ## neat.xsf <- with(as.data.frame(neat.x), cbind(total, total^2,
 ## total^3, anchor, anchor^2, anchor^3, total*anchor))
@@ -91,13 +91,13 @@ plot(neat.x)
 
 
 ###################################################
-### code chunk number 13: equatevignette.Rnw:459-460
+### code chunk number 13: equate-jss.Rnw:459-460
 ###################################################
 neat.xs <- presmoothing(neat.x, smooth = "log", degrees = list(3, 1))
 
 
 ###################################################
-### code chunk number 14: equatevignette.Rnw:465-470
+### code chunk number 14: equate-jss.Rnw:465-470
 ###################################################
 neat.xsmat <- presmoothing(neat.x, smooth = "loglinear",
 degrees = list(3, 1), stepup = TRUE)
@@ -119,58 +119,58 @@ plot(neat.x, neat.xsmat, ylty = 1:5)
 
 
 ###################################################
-### code chunk number 17: equatevignette.Rnw:480-481
+### code chunk number 17: equate-jss.Rnw:480-481
 ###################################################
 plot(neat.xs)
 
 
 ###################################################
-### code chunk number 18: equatevignette.Rnw:490-491
+### code chunk number 18: equate-jss.Rnw:490-491
 ###################################################
 plot(neat.x, neat.xsmat, ylty = 1:5)
 
 
 ###################################################
-### code chunk number 19: equatevignette.Rnw:501-503
+### code chunk number 19: equate-jss.Rnw:501-503
 ###################################################
 presmoothing(neat.x, smooth = "loglinear",
 degrees = list(c(3, 3), c(1, 1)), compare = TRUE)
 
 
 ###################################################
-### code chunk number 20: equatevignette.Rnw:510-511
+### code chunk number 20: equate-jss.Rnw:510-511
 ###################################################
 equate(act.x, act.y, type = "mean")
 
 
 ###################################################
-### code chunk number 21: equatevignette.Rnw:514-516
+### code chunk number 21: equate-jss.Rnw:514-516
 ###################################################
 neat.ef <- equate(neat.x, neat.y, type = "equip",
 method = "frequency estimation", smoothmethod = "log")
 
 
 ###################################################
-### code chunk number 22: equatevignette.Rnw:521-522
+### code chunk number 22: equate-jss.Rnw:521-522
 ###################################################
 summary(neat.ef)
 
 
 ###################################################
-### code chunk number 23: equatevignette.Rnw:526-528
+### code chunk number 23: equate-jss.Rnw:526-528
 ###################################################
 cbind(newx = c(3, 29, 8, 7, 13),
 yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
 
 
 ###################################################
-### code chunk number 24: equatevignette.Rnw:531-532
+### code chunk number 24: equate-jss.Rnw:531-532
 ###################################################
 head(neat.ef$concordance)
 
 
 ###################################################
-### code chunk number 25: equatevignette.Rnw:536-542
+### code chunk number 25: equate-jss.Rnw:536-542
 ###################################################
 neat.i <- equate(neat.x, neat.y, type = "ident")
 neat.lt <- equate(neat.x, neat.y, type = "linear",
@@ -187,13 +187,13 @@ plot(neat.comp, addident = FALSE)
 
 
 ###################################################
-### code chunk number 27: equatevignette.Rnw:551-552
+### code chunk number 27: equate-jss.Rnw:551-552
 ###################################################
 plot(neat.comp, addident = FALSE)
 
 
 ###################################################
-### code chunk number 28: equatevignette.Rnw:565-573
+### code chunk number 28: equate-jss.Rnw:565-573
 ###################################################
 pisa.i <- equate(pisa, type = "ident", lowp = c(3.5, 2))
 pisa.m <- equate(pisa, type = "mean", lowp = c(3.5, 2))
@@ -213,14 +213,14 @@ xpoints = pisa, morepars = list(ylim = c(0, 31)))
 
 
 ###################################################
-### code chunk number 30: equatevignette.Rnw:581-582
+### code chunk number 30: equate-jss.Rnw:581-582
 ###################################################
 plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = FALSE,
 xpoints = pisa, morepars = list(ylim = c(0, 31)))
 
 
 ###################################################
-### code chunk number 31: equatevignette.Rnw:593-597
+### code chunk number 31: equate-jss.Rnw:593-597
 ###################################################
 pisa.x <- freqtab(totals$b4[1:200, c("r3a", "r2", "s2")],
 scales = list(0:15, 0:17, 0:18))
@@ -229,7 +229,7 @@ scales = list(0:16, 0:17, 0:18))
 
 
 ###################################################
-### code chunk number 32: equatevignette.Rnw:602-608
+### code chunk number 32: equate-jss.Rnw:602-608
 ###################################################
 pisa.mnom <- equate(pisa.x, pisa.y, type = "mean",
 method = "nom")
@@ -240,7 +240,7 @@ method = "freq", smooth = "loglin")
 
 
 ###################################################
-### code chunk number 33: equatevignette.Rnw:611-617
+### code chunk number 33: equate-jss.Rnw:611-617
 ###################################################
 pisa.snom <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
 type = "mean", method = "nom")
@@ -259,7 +259,7 @@ col = rep(rainbow(3), 2), lty = rep(1:2, each = 3))
 
 
 ###################################################
-### code chunk number 35: equatevignette.Rnw:627-628
+### code chunk number 35: equate-jss.Rnw:627-628
 ###################################################
 plot(pisa.snom, pisa.stuck, pisa.sfreq,
 pisa.mnom, pisa.mtuck, pisa.mfreq,
@@ -267,7 +267,7 @@ col = rep(rainbow(3), 2), lty = rep(1:2, each = 3))
 
 
 ###################################################
-### code chunk number 36: equatevignette.Rnw:645-653
+### code chunk number 36: equate-jss.Rnw:645-653
 ###################################################
 neat.xp <- presmoothing(neat.x, "loglinear", degrees = list(4, 2))
 neat.xpmat <- presmoothing(neat.x, "loglinear", degrees = list(4, 2),
@@ -292,19 +292,19 @@ plot(neat.y, neat.ypmat)
 
 
 ###################################################
-### code chunk number 39: equatevignette.Rnw:664-665
+### code chunk number 39: equate-jss.Rnw:664-665
 ###################################################
 plot(neat.x, neat.xpmat)
 
 
 ###################################################
-### code chunk number 40: equatevignette.Rnw:674-675
+### code chunk number 40: equate-jss.Rnw:674-675
 ###################################################
 plot(neat.y, neat.ypmat)
 
 
 ###################################################
-### code chunk number 41: equatevignette.Rnw:683-688
+### code chunk number 41: equate-jss.Rnw:683-688
 ###################################################
 set.seed(131031)
 reps <- 100
@@ -314,7 +314,7 @@ crit <- equate(neat.xp, neat.yp, "e", "c")$conc$yx
 
 
 ###################################################
-### code chunk number 42: equatevignette.Rnw:691-702
+### code chunk number 42: equate-jss.Rnw:691-702
 ###################################################
 neat.args <- list(i = list(type = "i"),
 mt = list(type = "mean", method = "t"),
@@ -330,7 +330,7 @@ reps = reps, crit = crit, args = neat.args)
 
 
 ###################################################
-### code chunk number 43: equatevignette.Rnw:705-712
+### code chunk number 43: equate-jss.Rnw:705-712
 ###################################################
 plot(bootout, addident = FALSE, col = c(1, rainbow(8)))
 plot(bootout, out = "se", addident = FALSE,
@@ -369,40 +369,40 @@ col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
 
 
 ###################################################
-### code chunk number 48: equatevignette.Rnw:731-732
+### code chunk number 48: equate-jss.Rnw:731-732
 ###################################################
 plot(bootout, addident = FALSE, col = c(1, rainbow(8)))
 
 
 ###################################################
-### code chunk number 49: equatevignette.Rnw:741-742
+### code chunk number 49: equate-jss.Rnw:741-742
 ###################################################
 plot(bootout, out = "se", addident = FALSE,
 col = c(1, rainbow(8)), legendplace = "top")
 
 
 ###################################################
-### code chunk number 50: equatevignette.Rnw:751-752
+### code chunk number 50: equate-jss.Rnw:751-752
 ###################################################
 plot(bootout, out = "bias", addident = FALSE, legendplace = "top",
 col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
 
 
 ###################################################
-### code chunk number 51: equatevignette.Rnw:761-762
+### code chunk number 51: equate-jss.Rnw:761-762
 ###################################################
 plot(bootout, out = "rmse", addident = FALSE, legendplace = "top",
 col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
 
 
 ###################################################
-### code chunk number 52: equatevignette.Rnw:770-771
+### code chunk number 52: equate-jss.Rnw:770-771
 ###################################################
 round(summary(bootout), 2)
 
 
 ###################################################
-### code chunk number 53: equatevignette.Rnw:773-775
+### code chunk number 53: equate-jss.Rnw:773-775
 ###################################################
 detach(PISA)
 options(op)

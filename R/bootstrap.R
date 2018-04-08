@@ -21,12 +21,12 @@
 #' multiple equatings are performed at each replication in the bootstrapping.
 #' 
 #' The summary method returns a \code{data.frame} of mean standard errors,
-#' bias, and rmse, and weighted and absolute means, as applicable.
+#' bias, and rmse, and weighted means, as applicable.
 #' 
 #' @param x either an equating object, obtained with the \code{\link{equate}}
 #' function, or a score distribution of class \dQuote{\code{\link{freqtab}}}.
 #' @param xp,yp optional frequency tables replacing those equated in \code{x},
-#' used for parametric bootsampling.
+#' used for parametric bootstrap resampling.
 #' @param y score distribution of class \dQuote{\code{\link{freqtab}}}.
 #' @param xn,yn integers specifying the number of scores to sample from each
 #' distribution at each replication (default is the total number observed in
@@ -62,8 +62,8 @@
 #' \code{args} is a list of equating arguments, matrices are returned for the
 #' mean functions, standard error, bias, and RMSE, and the equating functions
 #' will be returned as a list of matrices. The \code{summary} method returns a
-#' data frame of mean standard errors, bias, and rmse, and weighted and
-#' absolute means, as applicable.
+#' data frame of mean standard errors, bias, and rmse, and weighted means,
+#' as applicable.
 #' @author Anthony Albano \email{tony.d.albano@@gmail.com}
 #' @seealso \code{\link{plot.bootstrap}}
 #' @keywords methods
@@ -93,7 +93,7 @@
 #' @export
 bootstrap <- function(x, ...) UseMethod("bootstrap")
 
-#' @describeIn bootstrap Default boostrap method for
+#' @describeIn bootstrap Default bootstrap method for
 #' \dQuote{\code{\link{freqtab}}} objects.
 #' @export
 bootstrap.default <- function(x, y, ...) {
@@ -214,7 +214,8 @@ bootstrap.freqtab <- function(x, y, xn = sum(x), yn = sum(y), reps = 100,
     se = sapply(eqmats, apply, 1, sd))
   if (!missing(crit)) {
     out$bias <- sapply(eqmats, apply, 1, mean) - crit
-    out$rmse <- sqrt(out$bias^2 + out$se^2)
+    out$rmse <- sapply(eqmats, function(z)
+      sqrt(rowMeans((z - crit)^2)))
   }
   if (neq == 1)
     out[-(1:6)] <- lapply(out[-(1:6)], c)
@@ -270,21 +271,18 @@ summary.bootstrap <- function(object, weights,
   if (missing(subset))
     subset <- 1:length(scales(object$x))
   if (missing(weights))
-    weights <- c(margin(object$x))[subset]/
-    sum(margin(object$x)[subset])
+    weights <- c(margin(object$x))[subset] /
+      sum(margin(object$x)[subset])
   tempse <- cbind(object$se)[subset, , drop = FALSE]
-  out <- data.frame(se = apply(tempse, 2, mean),
-    w.se = apply(tempse * weights, 2, mean))
+  out <- data.frame(se = sqrt(colMeans(tempse^2)),
+    se_w = sqrt(colSums(tempse^2 * weights)))
   if (!is.null(object$bias)) {
     tempbias <- cbind(object$bias)[subset, , drop = FALSE]
-    out$bias <- apply(tempbias, 2, mean)
-    out$a.bias <- apply(abs(tempbias), 2, mean)
-    out$w.bias <- apply(tempbias * weights, 2, mean)
-    out$wa.bias <- apply(abs(tempbias * weights), 2, mean)
-    out$rmse <- apply(cbind(object$rmse)[subset, , drop = FALSE],
-      2, mean)
-    out$w.rmse <- apply(cbind(object$rmse)[subset, , drop = FALSE] *
-        weights, 2, mean)
+    temprmse <- cbind(object$rmse)[subset, , drop = FALSE]
+    out$bias <- sqrt(colMeans(tempbias^2))
+    out$bias_w <- sqrt(colSums(tempbias^2 * weights))
+    out$rmse <- sqrt(colMeans(temprmse^2))
+    out$rmse_w <- sqrt(colSums(temprmse^2 * weights))
   }
   class(out) <- c("summary.bootstrap", "data.frame")
   

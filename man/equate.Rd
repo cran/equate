@@ -2,9 +2,9 @@
 % Please edit documentation in R/equate.R
 \name{equate}
 \alias{equate}
-\alias{equate.default}
-\alias{equate.freqtab}
 \alias{equate.list}
+\alias{equate.freqtab}
+\alias{equate.default}
 \alias{summary.equate}
 \alias{summary.equate.list}
 \title{Observed Score Linking and Equating}
@@ -28,11 +28,14 @@ equate(x, ...)
 \item{x, y}{for the default method, \code{x} must be a vector of scores and
 \code{y} an object of class \dQuote{\code{equate}}, the output of a previous
 equating. The standard usage is to provide \code{x} as a frequency table of
-class \dQuote{\code{freqtab}}, where \code{y} is also a frequeny table, and
+class \dQuote{\code{freqtab}}, where \code{y} is also a frequency table, and
 \code{x} is equated to \code{y}; if \code{y} is missing, a single-group
 design is assumed. Finally, \code{x} may be a list of two or more frequency
 tables, in which case the required arguments for one or more equatings are
 listed in \code{args}. See below for details.}
+
+\item{\dots}{further arguments passed to or from other functions, including
+arguments specific to different equating methods. See below for details.}
 
 \item{args}{list of arguments passed to \code{equate}. See below for
 details.}
@@ -64,9 +67,6 @@ are returned.}
 
 \item{object}{output from either an equating or list of equatings, produced
 by the \code{equate} function.}
-
-\item{\dots}{further arguments passed to or from other functions, including
-arguments specific to different equating methods. See below for details.}
 }
 \value{
 When \code{y} contains output from an equating, a vector of equated
@@ -259,6 +259,7 @@ bootstrap bias and RMSE.
 \item \code{default}: Default equating method for a vector of raw scores \code{x}
 and equating output in \code{y}.
 }}
+
 \examples{
 
 # See vignette("equatevignette") and Albano (2016) for a
@@ -332,9 +333,6 @@ meq <- equate(m367, m567, type = "mean", method = "nom")
 plot(meq1, meq2, meq3, meq4, meq, req[[1]])
 
 }
-\author{
-Anthony Albano \email{tony.d.albano@gmail.com}
-}
 \references{
 Albano, A. D. (2016). equate: An R package for
 observed-score linking and equating. \emph{Journal of Statistical
@@ -355,5 +353,7 @@ distributed data. \emph{Journal of Educational Measurement, 49},
 \code{\link{freqbump}}, \code{\link{freqavg}},
 \code{\link{loglinear}}, \code{\link{bootstrap}}
 }
+\author{
+Anthony Albano \email{tony.d.albano@gmail.com}
+}
 \keyword{methods}
-
