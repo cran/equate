@@ -4,16 +4,18 @@
 \name{KBneat}
 \alias{KBneat}
 \title{Test Scores under a NEAT design}
-\format{A list of length two, where each element (\code{$x} and \code{$y})
+\format{
+A list of length two, where each element (\code{$x} and \code{$y})
 contains two columns of data, one for the total score and another for the
-anchor test score for each examinee.}
+anchor test score for each examinee.
+}
 \source{
 Kolen, M. J., & Brennan, R. L. (2004). \emph{Test Equating, Scaling,
 and Linking}. (2nd ed.), New York: Springer.
 
 The dataset can be downloaded as part of the CIPE software, available at the
 following link:
-\url{https://education.uiowa.edu/centers/casma}
+\url{https://education.uiowa.edu/casma}
 }
 \usage{
 KBneat

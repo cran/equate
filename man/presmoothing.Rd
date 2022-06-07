@@ -11,15 +11,32 @@
 \usage{
 presmoothing(x, ...)
 
-\method{presmoothing}{default}(x, smoothmethod = c("none", "average", "bump",
-  "loglinear"), jmin, asfreqtab = TRUE, ...)
+\method{presmoothing}{default}(
+  x,
+  smoothmethod = c("none", "average", "bump", "loglinear"),
+  jmin,
+  asfreqtab = TRUE,
+  ...
+)
 
 \method{presmoothing}{formula}(x, data, ...)
 
-loglinear(x, scorefun, degrees = list(4, 2, 2), grid, rmimpossible,
-  asfreqtab = TRUE, models, stepup = !missing(models), compare = FALSE,
-  choose = FALSE, choosemethod = c("chi", "aic", "bic"), chip,
-  verbose = FALSE, ...)
+loglinear(
+  x,
+  scorefun,
+  degrees = list(4, 2, 2),
+  grid,
+  rmimpossible,
+  asfreqtab = TRUE,
+  models,
+  stepup = !missing(models),
+  compare = FALSE,
+  choose = FALSE,
+  choosemethod = c("chi", "aic", "bic"),
+  chip,
+  verbose = FALSE,
+  ...
+)
 
 freqbump(x, jmin = 1e-06, asfreqtab = FALSE, ...)
 
@@ -105,14 +122,14 @@ full \code{glm} output should be returned.}
 \value{
 When \code{smoothmethod = "average"} or \code{smoothmethod =
 "bump"}, either a smoothed frequency vector or table is returned. Otherwise,
-\code{loglinear} returns the following: \item{}{when \code{compare = TRUE},
-an anova table for model fit} \item{}{when \code{asfreqtab = TRUE}, a
-smoothed frequency table} \item{}{when \code{choose = TRUE}, a smoothed
+\code{loglinear} returns the following: \itemize{\item{when \code{compare = TRUE},
+an anova table for model fit} \item{when \code{asfreqtab = TRUE}, a
+smoothed frequency table} \item{when \code{choose = TRUE}, a smoothed
 frequency table with attribute "anova" containing the model fit table for
-all models compared} \item{}{when \code{verbose = TRUE}, full \code{glm}
-output, for all nested models when \code{stepup = TRUE}} \item{}{when
+all models compared} \item{when \code{verbose = TRUE}, full \code{glm}
+output, for all nested models when \code{stepup = TRUE}} \item{when
 \code{stepup = TRUE} and \code{verbose = FALSE}, a \code{data.frame} of
-fitted frequencies, with one column per model}
+fitted frequencies, with one column per model}}
 }
 \description{
 These functions are used to smooth frequency distributions.
