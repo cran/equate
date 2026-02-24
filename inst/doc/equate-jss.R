@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", out.width = "75%", fig.width = 8, fig.height = 8)
 op <- options()
 options(show.signif.stars = FALSE, warn = -1, continue = "+    ")
@@ -45,14 +45,14 @@ plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 ## ----plotbivar, fig.cap = "Bivariate plot of KBneat total and anchor distributions."----
 plot(neat.x)
 
-## ---- eval = FALSE------------------------------------------------------------
-#  presmoothing(~ poly(total, 3, raw = T) + poly(anchor, 3, raw = T) +
-#  total:anchor, data = neat.x)
+## ----eval = FALSE-------------------------------------------------------------
+# presmoothing(~ poly(total, 3, raw = T) + poly(anchor, 3, raw = T) +
+# total:anchor, data = neat.x)
 
-## ---- eval = FALSE------------------------------------------------------------
-#  neat.xsf <- with(as.data.frame(neat.x), cbind(total, total^2,
-#  total^3, anchor, anchor^2, anchor^3, total*anchor))
-#  presmoothing(neat.x, smooth = "loglinear", scorefun = neat.xsf)
+## ----eval = FALSE-------------------------------------------------------------
+# neat.xsf <- with(as.data.frame(neat.x), cbind(total, total^2,
+# total^3, anchor, anchor^2, anchor^3, total*anchor))
+# presmoothing(neat.x, smooth = "loglinear", scorefun = neat.xsf)
 
 ## -----------------------------------------------------------------------------
 neat.xs <- presmoothing(neat.x, smooth = "log", degrees = list(3, 1))
@@ -184,7 +184,7 @@ col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
 ## -----------------------------------------------------------------------------
 round(summary(bootout), 2)
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 detach(PISA)
 options(op)
 

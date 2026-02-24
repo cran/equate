@@ -1,9 +1,9 @@
 Package: equate
 Type: Package
-Version: 2.0.8
+Version: 2.0.9
 Title: Observed-Score Linking and Equating
-Author: Anthony Albano <tony.d.albano@gmail.com>
-Maintainer: Anthony Albano <tony.d.albano@gmail.com>
+Authors@R: person(given = "Anthony", family = "Albano",
+  role = c("aut", "cre"), email = "tony.d.albano@gmail.com")
 URL: https://github.com/talbano/equate
 BugReports: https://github.com/talbano/equate/issues
 Depends: R (>= 4.1.0)
@@ -23,10 +23,12 @@ Description: Contains methods for observed-score linking
 LazyLoad: yes
 LazyData: yes
 License: GPL-3
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.3
 Suggests: knitr, rmarkdown, bookdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-06-07 16:00:55 UTC; albano
+Packaged: 2026-02-24 01:44:19 UTC; albano
+Author: Anthony Albano [aut, cre]
+Maintainer: Anthony Albano <tony.d.albano@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-06-07 16:50:02 UTC
+Date/Publication: 2026-02-24 06:30:02 UTC
